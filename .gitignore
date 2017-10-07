@@ -1,17 +1,23 @@
 # yoanlcq: These were added arbitrarily. These are not actual "built-in"
 # names, but I'd like us to use some of these.
-/Assets/**/[mM]usic
+/Assets/**/[mM]usic/*
 /Assets/**/[mM]usic.meta
-/Assets/**/[sS]ounds
+!/Assets/**/[mM]usic/.gitkeep
+/Assets/**/[sS]ounds/*
 /Assets/**/[sS]ounds.meta
-/Assets/**/[mM]odels
+!/Assets/**/[sS]ounds/.gitkeep
+/Assets/**/[mM]odels/*
 /Assets/**/[mM]odels.meta
-/Assets/**/[iI]mages
+!/Assets/**/[mM]odels/.gitkeep
+/Assets/**/[iI]mages/*
 /Assets/**/[iI]mages.meta
-/Assets/**/[tT]extures
+!/Assets/**/[iI]mages/.gitkeep
+/Assets/**/[tT]extures/*
 /Assets/**/[tT]extures.meta
-/Assets/**/[mM]edia
+!/Assets/**/[tT]extures/.gitkeep
+/Assets/**/[mM]edia/*
 /Assets/**/[mM]edia.meta
+!/Assets/**/[mM]edia/.gitkeep
 
 # yoanlcq: These are part of GitHub's gitignore for Unity.
 
