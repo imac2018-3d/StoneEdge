@@ -1,3 +1,17 @@
+# yoanlcq: These were added arbitrarily. These are not actual "built-in"
+# names, but I'd like us to some of these.
+/Assets/**/[aA]udio
+/Assets/**/[mM]usic
+/Assets/**/[sS]ounds
+/Assets/**/[mM]odels
+/Assets/**/[iI]mages
+/Assets/**/[iI]mg
+/Assets/**/[tT]extures
+/Assets/**/[tT]ex
+/Assets/**/[mM]edia
+
+# yoanlcq: These are part of GitHub's gitignore for Unity.
+
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
