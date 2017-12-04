@@ -3,23 +3,19 @@
 user=se
 site=yoanlecoq.com
 mirror_opts=""
-do_backup=true
+do_backup=false
 do_mirror=true
 leave=true
 
 case $1 in
 login)
     do_mirror=false
-    do_backup=false
     leave=false
     ;;
 pull)
-    do_mirror=true
     do_backup=true
     ;;
 push)
-    do_mirror=true
-    do_backup=false
     mirror_opts+=" --reverse "
     ;;
 *)
@@ -53,13 +49,9 @@ script="\
     set ftp:list-options -a; \
     set xfer:log-file lftp_assets.log; \
     set xfer:log true; \
-    set xfer:backup-suffix bak; \
-    set xfer:make-backup true; \
-    set xfer:keep-backup true; \
 "
 
-mirror_opts+=" --only-newer --verbose=3 \
-    --exclude-glob=.git* --exclude-glob=*.bak "
+mirror_opts+=" --only-newer --verbose=3 --exclude-glob=.git* "
 
 if $do_mirror; then
     script+=" mirror $mirror_opts "
