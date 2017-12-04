@@ -2,27 +2,35 @@
 
 user=se
 site=yoanlecoq.com
-mirror_opts=" --only-newer --exclude-glob=.git* "
+mirror_opts=" --only-newer --exclude-glob=.git* --verbose=3 "
+do_mirror=true
+leave=true
 
 case $1 in
+login)
+    do_mirror=false
+    leave=false
+    ;;
 pull)
+    do_mirror=true
     ;;
 push)
+    do_mirror=true
     mirror_opts+=" --reverse "
     ;;
 *)
-    echo Usage: $0 "<pull|push> [--verbose] [--dry-run]"
+    echo Usage: $0 "<pull|push|login> [--dry-run] [--stay]"
     exit
     ;;
 esac
 
 for arg in $@; do
     case $arg in
-    --verbose)
-        mirror_opts+=" --verbose=3 "
-        ;;
     --dry-run)
         mirror_opts+=" --dry-run "
+        ;;
+    --stay)
+        leave=false
         ;;
     esac
 done
@@ -36,10 +44,15 @@ script="\
     set xfer:make-backup true; \
     set xfer:keep-backup true; \
 "
-script+=" mirror $mirror_opts "
-for i in Textures Models Sounds Music; do
-    script+=" --directory=$i "
-done
-script+="--target-directory=. && echo Done && exit; "
+if $do_mirror; then
+    script+=" mirror $mirror_opts "
+    for i in Textures Models Sounds Music; do
+        script+=" --directory=$i "
+    done
+    script+="--target-directory=. && echo Done; "
+fi
+if $leave; then
+    script+=" exit; "
+fi
 
 lftp "$site" -u "$user@$site" -e "$script"
