@@ -19,7 +19,7 @@ pull)
     ;;
 push)
     do_mirror=true
-    do_backup=true
+    do_backup=false
     mirror_opts+=" --reverse "
     ;;
 *)
@@ -43,9 +43,9 @@ for arg in $@; do
 done
 
 if $do_backup; then
-    echo "--- Backing up local assets"
+    echo "First, ensuring local assets are backed up..."
     ./backup_assets.sh
-    echo "--- Done."
+    echo "... Done."
 fi
 
 script="\
