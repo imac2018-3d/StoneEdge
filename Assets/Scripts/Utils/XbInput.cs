@@ -20,7 +20,6 @@ internal enum TriggerRange {
 	NegativeOneToOne,
 }
 
-
 internal interface IXbInputMappings {
 	KeyCode A { get; }
 	KeyCode B { get; }

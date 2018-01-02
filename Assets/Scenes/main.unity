@@ -371,36 +371,36 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MenuBackBinding:
-    Keyboard: 0
-    XboxController: 0
-    ExtraAliases: 
+    Keyboard: 27
+    XboxController: 1
+    ExtraAliases: 08000000
   MenuConfirmBinding:
-    Keyboard: 0
+    Keyboard: 13
     XboxController: 0
-    ExtraAliases: 
+    ExtraAliases: 20000000
   PauseMenuBinding:
-    Keyboard: 0
-    XboxController: 0
+    Keyboard: 27
+    XboxController: 7
     ExtraAliases: 
   JumpBinding:
-    Keyboard: 0
+    Keyboard: 32
     XboxController: 0
     ExtraAliases: 
   DodgeBinding:
-    Keyboard: 0
-    XboxController: 0
+    Keyboard: 304
+    XboxController: 5
     ExtraAliases: 
   BasicAttackBinding:
-    Keyboard: 0
-    XboxController: 0
+    Keyboard: 102
+    XboxController: 2
     ExtraAliases: 
   MagnetImpactBinding:
-    Keyboard: 0
-    XboxController: 0
+    Keyboard: 101
+    XboxController: 1
     ExtraAliases: 
   JumpQuakeBinding:
-    Keyboard: 0
-    XboxController: 0
+    Keyboard: 97
+    XboxController: 3
     ExtraAliases: 
 --- !u!4 &2059148677
 Transform:
