@@ -98,12 +98,12 @@ internal class XbInputMappingsLinux: IXbInputMappings {
 	public string RT { get { return "Axis 6"; } }
 	public TriggerRange TriggersRange { get { return TriggerRange.ZeroToOne; } }
 	public DPadMethod DPadMethod { get { return DPadMethod.AxisPair; } }
-	// Wireless
+	// Wireless controllers only
 	public KeyCode DPadUp { get { return KeyCode.JoystickButton13; } }
 	public KeyCode DPadDown { get { return KeyCode.JoystickButton14; } }
 	public KeyCode DPadLeft { get { return KeyCode.JoystickButton11; } }
 	public KeyCode DPadRight { get { return KeyCode.JoystickButton12; } }
-	// Wired
+	// Wired controllers only
 	public string DPadX { get { return "Axis 7"; } }
 	public string DPadY { get { return "Axis 8"; } }
 }
