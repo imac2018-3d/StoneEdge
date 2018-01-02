@@ -5,6 +5,8 @@
 using System;
 using UnityEngine;
 
+namespace Utils {
+
 internal class MakeCSharpHappyException: Exception {
 	public MakeCSharpHappyException(): base("This piece of code is unreachable but C# ain't clever enough to figure it out") {}
 }
@@ -280,3 +282,5 @@ public static class XbInput {
 		throw new MakeCSharpHappyException ();
 	}
 }
+
+} // namespace Utils

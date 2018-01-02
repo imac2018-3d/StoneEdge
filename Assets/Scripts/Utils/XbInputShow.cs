@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace Utils {
+	
 public class XbInputShow: MonoBehaviour {
 	public bool A, B, X, Y, LB, RB, Back, Start, LStickClick, RStickClick;
 	public Vector2 LStick, RStick, DPad;
@@ -23,3 +25,4 @@ public class XbInputShow: MonoBehaviour {
 		RT = XbInput.GetAxis (XbAxis.RT);
 	}
 }
+} // namespace Utils
