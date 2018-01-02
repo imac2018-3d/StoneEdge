@@ -5,7 +5,16 @@ using System.Linq;
 using Utils;
 
 namespace Se {
+
+	// NOTE: I would like this to be a ScriptableObject, but it's not possible right now.
+	// It needs to register for Update() events and this can only be done by being a MonoBehaviour.
+	// Let's just pretend it is a singleton for now. This is enforced in the Awake() override.
 	public class InputActions : MonoBehaviour {
+
+		void Awake() {
+			Exit.If(1 != FindObjectsOfType<InputActions>().Length, "There must be exactly one InputActions instance!");
+		}
+
 		[Serializable]
 		public struct ButtonBinding {
 			public KeyCode Keyboard;
