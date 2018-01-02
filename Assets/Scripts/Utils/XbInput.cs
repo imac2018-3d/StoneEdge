@@ -64,12 +64,12 @@ internal class XbInputMappingsOSX: IXbInputMappings {
 	public KeyCode Start { get { return KeyCode.JoystickButton9; } }
 	public KeyCode LStickClick { get { return KeyCode.JoystickButton11; } }
 	public KeyCode RStickClick { get { return KeyCode.JoystickButton12; } }
-	public string LX { get { return "Horizontal"; } }
-	public string LY { get { return "Vertical"; } }
-	public string RX { get { return "axis 3"; } }
-	public string RY { get { return "axis 4"; } }
-	public string LT { get { return "axis 5"; } }
-	public string RT { get { return "axis 6"; } }
+	public string LX { get { return "X Axis"; } }
+	public string LY { get { return "Y Axis"; } }
+	public string RX { get { return "Axis 3"; } }
+	public string RY { get { return "Axis 4"; } }
+	public string LT { get { return "Axis 5"; } }
+	public string RT { get { return "Axis 6"; } }
 	public TriggerRange TriggersRange { get { return TriggerRange.NegativeOneToOne; } }
 	public DPadMethod DPadMethod { get { return DPadMethod.FourButtons; } }
 	public KeyCode DPadUp { get { return KeyCode.JoystickButton5; } }
@@ -90,12 +90,12 @@ internal class XbInputMappingsLinux: IXbInputMappings {
 	public KeyCode Start { get { return KeyCode.JoystickButton7; } }
 	public KeyCode LStickClick { get { return KeyCode.JoystickButton9; } }
 	public KeyCode RStickClick { get { return KeyCode.JoystickButton10; } }
-	public string LX { get { return "Horizontal"; } }
-	public string LY { get { return "Vertical"; } }
-	public string RX { get { return "axis 4"; } }
-	public string RY { get { return "axis 5"; } }
-	public string LT { get { return "axis 3"; } }
-	public string RT { get { return "axis 6"; } }
+	public string LX { get { return "X Axis"; } }
+	public string LY { get { return "Y Axis"; } }
+	public string RX { get { return "Axis 4"; } }
+	public string RY { get { return "Axis 5"; } }
+	public string LT { get { return "Axis 3"; } }
+	public string RT { get { return "Axis 6"; } }
 	public TriggerRange TriggersRange { get { return TriggerRange.ZeroToOne; } }
 	public DPadMethod DPadMethod { get { return DPadMethod.AxisPair; } }
 	// Wireless
@@ -104,8 +104,8 @@ internal class XbInputMappingsLinux: IXbInputMappings {
 	public KeyCode DPadLeft { get { return KeyCode.JoystickButton11; } }
 	public KeyCode DPadRight { get { return KeyCode.JoystickButton12; } }
 	// Wired
-	public string DPadX { get { return "axis 7"; } }
-	public string DPadY { get { return "axis 8"; } }
+	public string DPadX { get { return "Axis 7"; } }
+	public string DPadY { get { return "Axis 8"; } }
 }
 internal class XbInputMappingsWindows: IXbInputMappings {
 	public KeyCode A { get { return KeyCode.JoystickButton0; } }
@@ -118,16 +118,16 @@ internal class XbInputMappingsWindows: IXbInputMappings {
 	public KeyCode Start { get { return KeyCode.JoystickButton7; } }
 	public KeyCode LStickClick { get { return KeyCode.JoystickButton8; } }
 	public KeyCode RStickClick { get { return KeyCode.JoystickButton9; } }
-	public string LX { get { return "Horizontal"; } }
-	public string LY { get { return "Vertical"; } }
-	public string RX { get { return "axis 4"; } }
-	public string RY { get { return "axis 5"; } }
-	public string LT { get { return "axis 9"; } }
-	public string RT { get { return "axis 10"; } }
+	public string LX { get { return "X Axis"; } }
+	public string LY { get { return "Y Axis"; } }
+	public string RX { get { return "Axis 4"; } }
+	public string RY { get { return "Axis 5"; } }
+	public string LT { get { return "Axis 9"; } }
+	public string RT { get { return "Axis 10"; } }
 	public TriggerRange TriggersRange { get { return TriggerRange.ZeroToOne; } }
 	public DPadMethod DPadMethod { get { return DPadMethod.AxisPair; } }
-	public string DPadX { get { return "axis 6"; } }
-	public string DPadY { get { return "axis 7"; } }
+	public string DPadX { get { return "Axis 6"; } }
+	public string DPadY { get { return "Axis 7"; } }
 	public KeyCode DPadUp    { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
 	public KeyCode DPadDown  { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
 	public KeyCode DPadLeft  { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
@@ -251,7 +251,8 @@ public static class XbInput {
 		case XbAxis.DPadY: return (float)m.GetDPadY ();
 		case XbAxis.LT: return m.GetLT ();
 		case XbAxis.RT: return m.GetRT ();
-		case XbAxis.RY: return -Input.GetAxis (axisToString(axis)); // NOTE: Hack. We don't need to do it for LY, because it always maps to "Vertical" which is already inverted.
+		case XbAxis.LY: return -Input.GetAxis (axisToString(axis)); // XXX: Assumes "Y Axis" doesn't have the "Inverted" checkbox checked.
+		case XbAxis.RY: return -Input.GetAxis (axisToString(axis));
 		default: return Input.GetAxis (axisToString(axis));
 		}
 	}
@@ -261,7 +262,8 @@ public static class XbInput {
 		case XbAxis.DPadY: return (float)m.GetDPadYRaw ();
 		case XbAxis.LT: return m.GetLTRaw ();
 		case XbAxis.RT: return m.GetRTRaw ();
-		case XbAxis.RY: return -Input.GetAxisRaw (axisToString(axis)); // NOTE: Hack. We don't need to do it for LY, because it always maps to "Vertical" which is already inverted.
+		case XbAxis.LY: return -Input.GetAxisRaw (axisToString(axis)); // XXX: Assumes "Y Axis" doesn't have the "Inverted" checkbox checked.
+		case XbAxis.RY: return -Input.GetAxisRaw (axisToString(axis));
 		default: return Input.GetAxisRaw (axisToString(axis));
 		}
 	}
