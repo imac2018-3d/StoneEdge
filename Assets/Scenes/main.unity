@@ -108,6 +108,61 @@ NavMeshSettings:
     tileSize: 256
     accuratePlacement: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1224440837
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 1224440839}
+  - component: {fileID: 1224440838}
+  m_Layer: 0
+  m_Name: XbInputShow
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1224440838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1224440837}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 705ccea3eb395e245bc9a8252760ee30, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  A: 0
+  B: 0
+  X: 0
+  Y: 0
+  LB: 0
+  RB: 0
+  Back: 0
+  Start: 0
+  LStickClick: 0
+  RStickClick: 0
+  LStick: {x: 0, y: 0}
+  RStick: {x: 0, y: 0}
+  DPad: {x: 0, y: 0}
+  LT: 0
+  RT: 0
+--- !u!4 &1224440839
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1224440837}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1513946609
 GameObject:
   m_ObjectHideFlags: 0
@@ -199,7 +254,6 @@ GameObject:
   - component: {fileID: 2043685097}
   - component: {fileID: 2043685096}
   - component: {fileID: 2043685095}
-  - component: {fileID: 2043685100}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -277,14 +331,75 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2043685100
+--- !u!1 &2059148675
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2059148677}
+  - component: {fileID: 2059148676}
+  m_Layer: 0
+  m_Name: InputActions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2059148676
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2043685094}
+  m_GameObject: {fileID: 2059148675}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 880ecf792aa4f426e9e233459e317b97, type: 3}
+  m_Script: {fileID: 11500000, guid: f6ffc596c26fc3f478a375619aff4650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MenuBackBinding:
+    Keyboard: 27
+    XboxController: 1
+    ExtraAliases: 08000000
+  MenuConfirmBinding:
+    Keyboard: 13
+    XboxController: 0
+    ExtraAliases: 20000000
+  PauseMenuBinding:
+    Keyboard: 27
+    XboxController: 7
+    ExtraAliases: 
+  JumpBinding:
+    Keyboard: 32
+    XboxController: 0
+    ExtraAliases: 
+  DodgeBinding:
+    Keyboard: 304
+    XboxController: 5
+    ExtraAliases: 
+  BasicAttackBinding:
+    Keyboard: 102
+    XboxController: 2
+    ExtraAliases: 
+  MagnetImpactBinding:
+    Keyboard: 101
+    XboxController: 1
+    ExtraAliases: 
+  JumpQuakeBinding:
+    Keyboard: 97
+    XboxController: 3
+    ExtraAliases: 
+--- !u!4 &2059148677
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2059148675}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
