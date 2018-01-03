@@ -47,6 +47,7 @@ internal interface IXbInputMappings {
 	DPadMethod DPadMethod { get; }
 	string DPadX { get; }
 	string DPadY { get; }
+	float DPadYFactor { get; }
 	KeyCode DPadUp { get; }
 	KeyCode DPadDown { get; }
 	KeyCode DPadLeft { get; }
@@ -78,6 +79,7 @@ internal class XbInputMappingsOSX: IXbInputMappings {
 	public KeyCode DPadRight { get { return KeyCode.JoystickButton8; } }
 	public string DPadX { get { throw new InternalMisuseException ("D-pad is not an axis on Mac OS X"); } }
 	public string DPadY { get { throw new InternalMisuseException ("D-pad is not an axis on Mac OS X"); } }
+	public float DPadYFactor { get { throw new InternalMisuseException ("D-pad is not an axis on Mac OS X"); } }
 }
 internal class XbInputMappingsLinux: IXbInputMappings {
 	public KeyCode A { get { return KeyCode.JoystickButton0; } }
@@ -106,6 +108,7 @@ internal class XbInputMappingsLinux: IXbInputMappings {
 	// Wired controllers only
 	public string DPadX { get { return "Axis 7"; } }
 	public string DPadY { get { return "Axis 8"; } }
+	public float DPadYFactor { get { return -1f; } }
 }
 internal class XbInputMappingsWindows: IXbInputMappings {
 	public KeyCode A { get { return KeyCode.JoystickButton0; } }
@@ -128,6 +131,7 @@ internal class XbInputMappingsWindows: IXbInputMappings {
 	public DPadMethod DPadMethod { get { return DPadMethod.AxisPair; } }
 	public string DPadX { get { return "Axis 6"; } }
 	public string DPadY { get { return "Axis 7"; } }
+	public float DPadYFactor { get { return 1f; } }
 	public KeyCode DPadUp    { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
 	public KeyCode DPadDown  { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
 	public KeyCode DPadLeft  { get { throw new InternalMisuseException("D-pad is an axis on Windows"); } }
@@ -143,10 +147,10 @@ internal class XbInputMappings: IXbInputMappings {
 	IXbInputMappings m = new XbInputMappingsOSX ();
 #endif
 	// NOTE: Take Func<> because merely getting the attribute may cause exceptions (it was designed that way)
-	int getDPadValue(Func<string, float> fGetAxis, Func<string> axis, Func<KeyCode> negative, Func<KeyCode> positive) {
+	int getDPadValue(Func<string, float> fGetAxis, Func<float> factor, Func<string> axis, Func<KeyCode> negative, Func<KeyCode> positive) {
 		switch(m.DPadMethod) {
 		case DPadMethod.AxisPair:
-			return Mathf.RoundToInt(fGetAxis(axis()));
+			return Mathf.RoundToInt(factor() * fGetAxis(axis()));
 		case DPadMethod.FourButtons:
 			int v = 0;
 			if (Input.GetKey (negative())) v -= 1;
@@ -155,10 +159,10 @@ internal class XbInputMappings: IXbInputMappings {
 		}
 		throw new MakeCSharpHappyException();
 	}
-	public int GetDPadX() { return getDPadValue (Input.GetAxis, () => m.DPadX, () => m.DPadLeft, () => m.DPadRight); }
-	public int GetDPadY() { return getDPadValue (Input.GetAxis, () => m.DPadY, () => m.DPadDown, () => m.DPadUp); }
-	public int GetDPadXRaw() { return getDPadValue (Input.GetAxisRaw, () => m.DPadX, () => m.DPadLeft, () => m.DPadRight); }
-	public int GetDPadYRaw() { return getDPadValue (Input.GetAxisRaw, () => m.DPadY, () => m.DPadDown, () => m.DPadUp); }
+	public int GetDPadX() { return getDPadValue (Input.GetAxis, () => 1f, () => m.DPadX, () => m.DPadLeft, () => m.DPadRight); }
+	public int GetDPadY() { return getDPadValue (Input.GetAxis, () => m.DPadYFactor, () => m.DPadY, () => m.DPadDown, () => m.DPadUp); }
+	public int GetDPadXRaw() { return getDPadValue (Input.GetAxisRaw, () => 1f, () => m.DPadX, () => m.DPadLeft, () => m.DPadRight); }
+	public int GetDPadYRaw() { return getDPadValue (Input.GetAxisRaw, () => m.DPadYFactor, () => m.DPadY, () => m.DPadDown, () => m.DPadUp); }
 
 	float getTrigger(float v) {
 		switch (m.TriggersRange) {
@@ -192,6 +196,7 @@ internal class XbInputMappings: IXbInputMappings {
 	public DPadMethod DPadMethod { get { return m.DPadMethod; } }
 	public string DPadX { get { return m.DPadX; } }
 	public string DPadY { get { return m.DPadY; } }
+	public float DPadYFactor { get { return m.DPadYFactor; } }
 	public KeyCode DPadUp { get { return m.DPadUp; } }
 	public KeyCode DPadDown { get { return m.DPadDown; } }
 	public KeyCode DPadLeft { get { return m.DPadLeft; } }
