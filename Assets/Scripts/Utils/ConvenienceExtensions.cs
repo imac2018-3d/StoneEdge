@@ -30,13 +30,13 @@ namespace Utils {
 		/// <summary>
 		/// Performs an operation on this component, catching any MissingComponentException.
 		/// </summary>
-		public static void IfValidComponent<T>(this T o, Action<T> a) {
+		public static void IfValidComponent<T>(this T o, Action<T> a) where T: Component {
 			o.IfNotNull(c => { try { a(c); } catch(MissingComponentException) {} });
 		}
 		/// <summary>
 		/// Performs an operation on this component, catching any MissingComponentException.
 		/// </summary>
-		public static TResult IfValidComponent<T, TResult>(this T o, Func<T, TResult> a) {
+		public static TResult IfValidComponent<T, TResult>(this T o, Func<T, TResult> a) where T: Component {
 			o.IfNotNull (c => { try { return a (c); } catch (MissingComponentException) {} return default(TResult);});
 			return default(TResult);
 		}

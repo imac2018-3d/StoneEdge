@@ -1,5 +1,4 @@
 ﻿// http://wiki.unity3d.com/index.php/Xbox360Controller
-// TODO: Test XbInput on Linux
 // TODO: Test XbInput on Mac OS X
 
 using System;

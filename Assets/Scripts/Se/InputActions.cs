@@ -1,4 +1,4 @@
-﻿// TODO: It would be convenient if its properties were static.
+﻿// TODO: InputActions's properties should be static instead.
 // Right now, if you want input, you need a reference to an InputActions instance, and it's annoying.
 
 using UnityEngine;
