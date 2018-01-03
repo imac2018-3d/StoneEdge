@@ -6,12 +6,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Utils;
 
 namespace Se {
 	public class FrozenTest : MonoBehaviour {
 		private KeyCode[] keys = new KeyCode[]{ KeyCode.Escape, KeyCode.Space };
 
 		void Start() {
+			keys.AssertNotNull ();
 			Debug.Log("Freeze this GameObject by pressing either Space or Escape!");
 		}
 
