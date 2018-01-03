@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿// TODO: It would be convenient if its properties were static.
+// Right now, if you want input, you need a reference to an InputActions instance, and it's annoying.
+
+using UnityEngine;
 using System;
 using System.Collections.Generic;
 using System.Linq;
