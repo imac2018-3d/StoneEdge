@@ -52,6 +52,19 @@ public class Spline : MonoBehaviour {
 	[HideInInspector]
 	public bool locked = true;
 
+
+	void OnDrawGizmos()
+	{
+		SplineNode[] nodes = GetComponentsInChildren<SplineNode>();
+		foreach (SplineNode node in nodes)
+		{
+			Gizmos.color = Color.cyan;
+			Gizmos.DrawLine(node.transform.position, node.transform.position + node.forward);
+			Gizmos.color = Color.yellow;
+			Gizmos.DrawLine(node.transform.position, node.transform.position + node.up);
+		}
+	}
+
 	void Start() {
 		FindEnds();
 	}
@@ -90,6 +103,8 @@ public class Spline : MonoBehaviour {
 			end = vert;
 		if(!vert.previous)
 			begin = vert;
+		vert.spline = this;
+		vert.colliderRadius = colliderRadius;
 	}
 	void OnDestroy() {
 		if(begin) {

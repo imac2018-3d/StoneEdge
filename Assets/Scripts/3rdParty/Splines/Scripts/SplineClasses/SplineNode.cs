@@ -17,8 +17,10 @@ public class SplineNode : MonoBehaviour {
 	public bool rotationFreedom;
 	public bool hideHandles;
 	public float pauseTime = 1;
-	public float speed = 2;
 	public float addOffset = .5f;
+
+	public float acceleration = 0.5f;
+	public float speed = 10;
 
 	public bool fromPrevious = true;
 	public bool fromNext = true;
@@ -38,15 +40,45 @@ public class SplineNode : MonoBehaviour {
 				UnlockObjects();
 		}
 	}
+	Vector3 _up = Vector3.up;
+	public Vector3 up
+	{
+		get { return transform.parent.rotation*_up; }
+		set { _up = value; }
+	}
 
+	Vector3 _forward = Vector3.right;
 	public Vector3 forward {
 		get {
-			if(next)
+			return _forward;
+		}
+	}
+	float _sqrMagnitude = 0;
+	public float sqrMagnitude
+	{
+		get
+		{
+			return _sqrMagnitude;
+		}
+	}
+
+	public Vector3 toNext
+	{
+		get
+		{
+			if (next != null)
 				return next.transform.position - transform.position;
 			else
 				return Vector3.right;
 		}
 	}
+
+	public void updateForward()
+	{
+			_forward = toNext.normalized;
+			_sqrMagnitude = toNext.sqrMagnitude;
+	}
+
 	public Vector3 getForward(bool ahead) {
 		if(ahead)
 			return forward;
@@ -109,7 +141,7 @@ public class SplineNode : MonoBehaviour {
 			//}
 		}
 		if(!colliderFreedom && next && spanCollider) {
-			spanCollider.transform.position = transform.position + forward * 0.5f;
+			spanCollider.transform.position = transform.position + toNext * 0.5f;
 			spanCollider.transform.LookAt(next.transform, transform.up);
 			switch(colliderType) {
 			case PrimitiveType.Capsule:
@@ -188,7 +220,7 @@ public class SplineNode : MonoBehaviour {
 				CapsuleCollider cap = obj.GetComponent<CapsuleCollider>();
 				cap.isTrigger = true;
 				cap.direction = 2;
-				cap.height = forward.magnitude + colliderRadius * 2;
+				cap.height = toNext.magnitude + colliderRadius * 2;
 				cap.radius = colliderRadius;
 				break;
 			case PrimitiveType.Plane:
@@ -232,15 +264,13 @@ public class SplineNode : MonoBehaviour {
 		dup.name = "Node";
 		SplineNode dupNode = dup.GetComponent<SplineNode>();
 		dupNode.spanCollider = null;
-		if(dupNode) {
-			if(next) {
-				next.previous = dupNode;
-				dupNode.next = next;
-				dupNode.AddCollider();
-			}
-			next = dupNode;													//The dup is now my previous node
-			dupNode.previous = this;										//I'm the dup's next node
-		}
+		if(next) {
+			next.previous = dupNode;
+			dupNode.next = next;
+			dupNode.AddCollider();
+		}	
+		next = dupNode;													//The dup is now my previous node
+		dupNode.previous = this;										//I'm the dup's next node
 		AddCollider();
 		if(spline)
 			spline.AddVert(dupNode);
