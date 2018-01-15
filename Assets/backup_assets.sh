@@ -1,5 +1,3 @@
-#!/bin/bash
-
 for i in `find Textures Models Sounds Music -type f`; do
     if [[ $i == *.meta ]] || [[ $i == *.git* ]]; then
         continue
