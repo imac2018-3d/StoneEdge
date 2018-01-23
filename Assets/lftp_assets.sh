@@ -1,5 +1,3 @@
-
-
 user=se
 site=yoanlecoq.com
 mirror_opts=""
