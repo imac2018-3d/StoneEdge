@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 user=se
 site=yoanlecoq.com

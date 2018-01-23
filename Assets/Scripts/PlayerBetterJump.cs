@@ -4,17 +4,16 @@ using UnityEngine;
 
 public class PlayerBetterJump : MonoBehaviour {
 
-	public float fallMultiplier = 2.5f;
-	public float lowJumpMultiplier = 2f;
+	public float fallMultiplier = 2.5f; // the multiplier to make the falling down part quicker than the jumping part
+	public float lowJumpMultiplier = 2f; // The multiplier to make the jumping part lower than the fall down
 
 	Rigidbody rb;
 
-	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
 	}
-	
-	// Update is called once per frame
+
+		// Apply the physics with the multopliers
 	void Update () {
 		if (rb.velocity.y < 0) {
 			rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;

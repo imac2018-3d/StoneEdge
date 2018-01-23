@@ -26,8 +26,7 @@ public class PlayerJump : MonoBehaviour {
 			grounded = false;
 		}
 	}
-	
-	// Update is called once per frame
+		
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space) && grounded == true) {
 			jumpMovement = new Vector3 (0.0f, 7.0f, 0.0f);
