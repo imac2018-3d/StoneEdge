@@ -1,4 +1,4 @@
-LocalBackups
-lftp_assets.log
 **/*.swp
 *.exe
+Art/**
+!Art/.gitkeep
