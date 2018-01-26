@@ -13,7 +13,7 @@ public class PlayerBetterJump : MonoBehaviour {
 		rb = GetComponent<Rigidbody> ();
 	}
 
-		// Apply the physics with the multopliers
+		// Apply the physics with the multipliers
 	void Update () {
 		if (rb.velocity.y < 0) {
 			rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
