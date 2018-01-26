@@ -1,28 +1,29 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using System;
 
 namespace Se {
-	public class LoreItem {
-		public int Type = 0;
-		public string Text = "default";
+	[Serializable]
+	public class LoreItemData {
+		public int Type;
+		public string Text;
 
-		public LoreItem(int type, string text) {
+		LoreItemData() {}
+		public LoreItemData(int type, string text) {
 			this.Type = type;
 			this.Text = text;
 		}
 	}
 
 	public static class LoreItemManager {
-		public static Dictionary<int, LoreItem> Lores = new Dictionary<int, LoreItem>()
+		public static Dictionary<int, LoreItemData> Lores = new Dictionary<int, LoreItemData>()
 	    {
-			{0, new LoreItem(0, "Ohoki's letter")},
-	     	{1, new LoreItem(1, "Astone Mechanics")},
-	     	{2, new LoreItem(2, "Report of Haaris")},
-	     	{3, new LoreItem(3, "Log of Oli Maroon")},
-	     	{4, new LoreItem(3, "Log of Karls")},
-	     	{5, new LoreItem(0, "Jaron's letter")}
+			{0, new LoreItemData(0, "Ohoki's letter")},
+	     	{1, new LoreItemData(1, "Astone Mechanics")},
+	     	{2, new LoreItemData(2, "Report of Haaris")},
+	     	{3, new LoreItemData(3, "Log of Oli Maroon")},
+	     	{4, new LoreItemData(3, "Log of Karls")},
+	     	{5, new LoreItemData(0, "Jaron's letter")}
 	    };
 	}
 
