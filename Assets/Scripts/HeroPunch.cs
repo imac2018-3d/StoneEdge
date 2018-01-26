@@ -9,6 +9,10 @@ public class HeroPunch : MonoBehaviour {
 	private GameObject punchClone;
 	public int punchShift = 3;
 
+	public float fallMultiplier = 3.5f; // the multiplier to make the falling down part quicker than the jumping part
+	public float lowJumpMultiplier = 3f; // The multiplier to make the jumping part lower than the fall down
+
+
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
 	}

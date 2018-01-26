@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ElectrickPunching : MonoBehaviour {
+public class MagneticPunchPhysic : MonoBehaviour {
+
+	public float forcePunch = 17f;
 
 	private Rigidbody heroRigidbody;
 	private Rigidbody ennemyRigidBody;
 
+	public float fallMultiplier = 3.5f; // the multiplier to make the falling down part quicker than the jumping part
+	public float lowJumpMultiplier = 3f; // The multiplier to make the jumping part lower than the fall down
 
-	// Use this for initialization
-	void Start () {
-	}
 
 	void OnTriggerEnter(Collider hit)
 	{
@@ -26,14 +27,9 @@ public class ElectrickPunching : MonoBehaviour {
 
 				// Create the vector for the ejection by calculating the vector between the hero and the ennemy
 			Vector3 heroToEnnemyVectorNormalized = (ennemyRigidBody.position - heroRigidbody.position).normalized;
-			Vector3 ejectEnnemy = heroToEnnemyVectorNormalized * 3.0f + Vector3.up * 3.0f;
-
+			//Vector3 ejectEnnemy = heroToEnnemyVectorNormalized * forcePunch + Vector3.up * forcePunch;
+			Vector3 ejectEnnemy = heroToEnnemyVectorNormalized * forcePunch + Vector3.up * forcePunch;
 			ennemyRigidBody.AddForce (ejectEnnemy, ForceMode.Impulse);
-			Debug.Log ("KICKKKKKK");
 		}
-	}
-	
-	// Update is called once per frame
-	void Update () {
 	}
 }
