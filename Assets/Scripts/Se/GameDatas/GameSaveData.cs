@@ -1,63 +1,51 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections.Generic;
 using System.IO;
-
+using System;
+using UnityEngine;
 
 namespace Se {
 
-	[System.Serializable]
-	public class GameSaveData {
+	[Serializable]
+	public struct GameSaveData {
+		public int LastCheckpoint;
+		public List<int> LoreItems;
+		public List<int> PowerUps;
 
-		public int LastCheckpoint = 0;
-		public int[] LoreItems = new int[0];
-		public int[] PowerUps = new int[0];
-
-		private static GameSaveData _instance;
-		public static GameSaveData Instance {
+		public bool IsEmpty {
 			get {
-				if (_instance == null) {
-					Se.GameSaveData.LoadGame();
-				}	
-				return _instance;
+				return LastCheckpoint == 0 && LoreItems == null && PowerUps == null;
+			}
+		}
+	}
+
+	public static class CurrentGameSaveData {
+		public static GameSaveData Data;
+		public static readonly string JsonFileName = "GameData.json";
+
+		public static string SavePath {
+			get { 
+				return Path.Combine(Application.dataPath, JsonFileName);
 			}
 		}
 
-		// NOTE: Saves datas in the gameDatas json file
-		public static void Save() {
-			string json =  Application.dataPath + "/gameDatas.json";
-			string str = JsonUtility.ToJson(_instance);
-			File.WriteAllText(json, str);
-		}
-
-		// NOTE: Load datas from the gameDatas json file
-		public static void LoadGame() {
-			string jsn = File.ReadAllText (Application.dataPath + "/gameDatas.json");
-			_instance = JsonUtility.FromJson<GameSaveData>(jsn);
-			if (Se.GameSaveData.IsEmpty()) { NewGame (); }
-		}
-
-		// NOTE: Checks if the game is new or an saved game
-		public static bool IsEmpty() {
-			if (Instance.LastCheckpoint == 0 && Instance.LoreItems == null && Instance.PowerUps == null) { return true; }
-			else { return false; }
-		}
-
-		// NOTE: Creates a new instance of GameSaveData and save new values
 		public static void NewGame() {
-			_instance = new GameSaveData();
-			Se.GameSaveData.Save();
+			Data = new GameSaveData ();
+			Save ();
 		}
 
-		public static int[] GetLoreItems() {
-			return Instance.LoreItems;
+		public static void Save() {
+			File.WriteAllText(SavePath, JsonUtility.ToJson(Data));
 		}
 
-		public static int[] GetPowerUps() {
-			return Instance.PowerUps;
+		public static void LoadGame() {
+			string json = File.ReadAllText (SavePath);
+			Data = JsonUtility.FromJson<GameSaveData>(json);
 		}
 
-		public static int GetLastCheckpoint() {
-			return Instance.LastCheckpoint;
+		public static bool IsEmpty {
+			get {
+				return Data.IsEmpty;
+			}
 		}
 	}
 }

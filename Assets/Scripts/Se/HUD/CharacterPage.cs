@@ -15,7 +15,7 @@ namespace Se {
 			Character.transform.Rotate (0, Time.deltaTime * 10, 0);
 
 			for(int ability = 0; ability < PowerUps.Length; ++ ability) {
-				foreach (int powerUpId in GameSaveData.GetPowerUps()) {
+				foreach (int powerUpId in CurrentGameSaveData.Data.PowerUps) {
 					if (powerUpId == ability) {
 						PowerUps [ability].SetActive (true);
 						break;
