@@ -23,14 +23,14 @@ namespace Se {
         }
 
         void OnTriggerEnter(Collider cld) {
-            var ce = cld.gameObject.GetComponent<ChunkEnterer> ();
+            var ce = cld.gameObject.GetComponent<Hero> ();
             if (ce == null)
                 return;
             Debug.Log ("\"" + ce.gameObject.name + "\" entered \"" + gameObject.name + "\"");
             Chunks.RegisterBridge (this);
         }
         void OnTriggerExit(Collider cld) {
-            var ce = cld.gameObject.GetComponent<ChunkEnterer> ();
+            var ce = cld.gameObject.GetComponent<Hero> ();
             if (ce == null)
                 return;
             Debug.Log ("\"" + ce.gameObject.name + "\" left \"" + gameObject.name + "\"");

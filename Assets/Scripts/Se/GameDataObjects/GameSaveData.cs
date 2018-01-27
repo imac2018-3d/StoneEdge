@@ -8,19 +8,29 @@ namespace Se {
 	[Serializable]
 	public struct GameSaveData {
 		public int LastCheckpoint;
-		public List<int> LoreItems;
-		public List<int> PowerUps;
+		public HashSet<int> LoreItems; // HashSet ensure uniqueness of values.
+		public bool HasAcquiredMagnetImpact;
+		public bool HasAcquiredJumpQuake;
 
+		public static readonly GameSaveData Empty = new GameSaveData {
+			LastCheckpoint = 0,
+			LoreItems = null,
+			HasAcquiredMagnetImpact = false,
+			HasAcquiredJumpQuake = false,
+		};
 		public bool IsEmpty {
-			get {
-				return LastCheckpoint == 0 && LoreItems == null && PowerUps == null;
+			get { 
+				return LastCheckpoint == Empty.LastCheckpoint
+				&& LoreItems == Empty.LoreItems
+				&& HasAcquiredJumpQuake == Empty.HasAcquiredJumpQuake
+				&& HasAcquiredMagnetImpact == Empty.HasAcquiredMagnetImpact;
 			}
 		}
 	}
 
 	public static class CurrentGameSaveData {
 		public static GameSaveData Data;
-		public static readonly string JsonFileName = "GameData.json";
+		public static readonly string JsonFileName = "GameSaveData.json";
 
 		public static string SavePath {
 			get { 
@@ -40,12 +50,6 @@ namespace Se {
 		public static void LoadGame() {
 			string json = File.ReadAllText (SavePath);
 			Data = JsonUtility.FromJson<GameSaveData>(json);
-		}
-
-		public static bool IsEmpty {
-			get {
-				return Data.IsEmpty;
-			}
 		}
 	}
 }
