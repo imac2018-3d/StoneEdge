@@ -16,7 +16,7 @@ namespace Se {
 		private bool gameStarted;
 
 		public void Start() {
-			Se.GameState.IsPaused = true;
+			GameState.Pause ();
 			ShowMenu (MainMenu);
 			gameStarted = false;
 		}

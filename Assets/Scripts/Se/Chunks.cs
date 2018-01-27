@@ -170,7 +170,7 @@ namespace Se {
                     syncWaitChunks.Add (c);
                 }
                 if(syncWaitChunks.Count > 0) {
-                    freezeTheWorld ();
+					GameState.FreezeTheWorld();
                 }
             }
         }
@@ -209,16 +209,9 @@ namespace Se {
             }
             // If all required Sync Chunks are loaded, resume the game.
             if (syncWaitChunks.Count > 0 && syncWaitChunks.All (c => Infos [c].State == State.Loaded)) {
-                defreezeTheWorld ();
+				GameState.DefreezeTheWorld();
                 syncWaitChunks.Clear();
             }
-        }
-
-        static void freezeTheWorld() {
-            // FIXME freezeTheWorld()
-        }
-        static void defreezeTheWorld() {
-            // FIXME defreezeTheWorld()
         }
     }
 }
