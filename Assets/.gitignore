@@ -1,4 +1,9 @@
 **/*.swp
 *.exe
+
+!Art/
 Art/**
 !Art/.gitkeep
+
+lftp*
+LocalBackups
