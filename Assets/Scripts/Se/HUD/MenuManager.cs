@@ -5,12 +5,11 @@ using System.Collections;
 
 namespace Se {
 
-	// NOTE: The classe manages all navigation between menus and when pause / resume a game.
+	// NOTE: The class manages all navigation between menus and when pause / resume a game.
 	public class MenuManager : MonoBehaviour {
 		public GameObject[] Menus;
 		public GameObject MainMenu;
 		public GameObject PauseMenu;
-		public InputActions IA;
 
 		private GameObject currentMenu;
 		private GameObject lastMenu;
@@ -24,11 +23,11 @@ namespace Se {
 
 		public void Update() {
 			if (gameStarted) {
-				if(!Se.GameState.IsPaused && IA.Pauses) { PauseGame (); }
-				else if (Se.GameState.IsPaused && IA.Resumes) { ResumeGame ();	}
+				if(!Se.GameState.IsPaused && InputActions.Pauses) { PauseGame (); }
+				else if (Se.GameState.IsPaused && InputActions.Resumes) { ResumeGame ();	}
 			}
 
-			if (IA.MenuBack && lastMenu) {
+			if (InputActions.MenuBack && lastMenu) {
 				Back ();
 			}
 		}
