@@ -44,6 +44,7 @@ namespace Se {
 			if (all.Count > 0) // FindObjectsOfType() is expensive, ensure we do this only once.
 				return;
 
+			Debug.Log ("Collecting all instances of " + typeof(T).Name);
 			var collected = FindObjectsOfType<T>();
 			foreach (var c in collected) {
 				try {

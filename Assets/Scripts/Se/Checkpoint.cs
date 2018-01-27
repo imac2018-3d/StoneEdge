@@ -15,6 +15,11 @@ namespace Se {
 			var hero = cld.gameObject.GetComponent<Hero> ();
 			if (hero == null)
 				return;
+			var prevID = CurrentGameSaveData.Data.LastCheckpoint;
+			Debug.Log (
+				"The last Checkpoint is now \""+gameObject.name+"\" (ID:"+ID+" )."
+				+" The previous one was \""+All[prevID].gameObject.name+"\" (ID: "+prevID+")."
+			);
 			CurrentGameSaveData.Data.LastCheckpoint = ID;
 		}
 	}

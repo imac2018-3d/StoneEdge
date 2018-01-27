@@ -16,7 +16,8 @@ namespace Se {
 				return;
 			// Adding to a HashSet is fine because the key is always only present once.
 			Assert.AreEqual (CurrentGameSaveData.Data.LoreItems.GetType(), typeof(HashSet<int>));
-			CurrentGameSaveData.Data.LoreItems.Add (ID);
+			bool wasAlreadyAcquired = !CurrentGameSaveData.Data.LoreItems.Add (ID);
+			Debug.Log ("Acquired Lore Item \""+gameObject.name+"\" (ID:"+ID+")" + (wasAlreadyAcquired ? " (was already acquired)" : ""));
 			// NOTE: For now, don't destroy the object. Pretend that the guardian has memorized the text.
 		}
 	}
