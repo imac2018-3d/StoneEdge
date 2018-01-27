@@ -7,8 +7,6 @@ public class PlayerAttack : MonoBehaviour {
 	private Rigidbody rb;
 	private GameObject target;
 
-	public float fallMultiplier = 3.5f; // the multiplier to make the falling down part quicker than the jumping part
-	public float lowJumpMultiplier = 3f; // The multiplier to make the jumping part lower than the fall down
 
 	void Start () {
 		rb = GetComponent<Rigidbody> ();

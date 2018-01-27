@@ -94,9 +94,7 @@ namespace Se {
 					return new Jump ();
 				}else if (go.GetComponent<Hero> ().grounded && Input.GetKeyDown (KeyCode.X)) {
 					return new Punch ();
-				}else if (Input.GetKeyDown (KeyCode.X)) {
-					return new Punch ();
-				}else if (Input.GetKeyDown (KeyCode.C)) {
+				}else if (go.GetComponent<Hero> ().grounded && Input.GetKeyDown (KeyCode.C)) {
 					return new MagnetImpact ();
 				}else if (Input.GetKeyDown (KeyCode.N)) {
 					go.GetComponent<Hero> ().rightDodge = true;
