@@ -19,9 +19,16 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Assertions;
+using Utils;
 
 namespace Se {
 
+	// TODO: Set these to actual chunk names for our game! Jungle Desert Sea and Lava were only for testing.
+	// It's fine to remove Jungle Desert Sea and Lava.
+	// IT IS NOT FINE to change the value of, or remove, a true chunk of the game, because it would break everything.
+	// 
+	// Therefore, please only add new chunks, with a unique value, 
+	// and DO NOT remove any existing one. Only mark them as obsolete in the loadInfos() method.
     public enum ChunkID {
         Jungle = 1,
         Desert = 2,
@@ -31,17 +38,19 @@ namespace Se {
 
     public class Chunks : MonoBehaviour {
         public enum State { Unloaded, Loading, Loaded, Unloading, }
+		public enum Obsolete { Yes, No, }
 
         static Dictionary<ChunkID, Info> loadInfos() {
             return new Dictionary<ChunkID, Info>() {
-                { ChunkID.Jungle, new Info("Jungle") },
-                { ChunkID.Desert, new Info("Desert") },
-                { ChunkID.Sea, new Info("Sea") },
-                { ChunkID.Lava, new Info("Lava") },
+				{ ChunkID.Jungle, new Info("Jungle", Obsolete.Yes) },
+				{ ChunkID.Desert, new Info("Desert", Obsolete.Yes) },
+				{ ChunkID.Sea, new Info("Sea", Obsolete.Yes) },
+				{ ChunkID.Lava, new Info("Lava", Obsolete.Yes) },
             };
         }
 
         public class Info {
+			public Obsolete Obsolete;
             public State State;
             public string SceneName = null;
             public AsyncOperation AsyncLoadingOp = null;
@@ -51,10 +60,19 @@ namespace Se {
             bool isLoaded { get { var s = GetSceneIfLoaded (); return s.HasValue && s.Value.isLoaded; } }
 
             Info() {}
-            internal Info(string sceneName) {
-                State = isLoaded ? State.Loaded : State.Unloaded;
-                SceneName = sceneName;
-                Assert.IsTrue(SceneUtility.GetBuildIndexByScenePath(SceneName) >= 0, "Scene \"" + sceneName + "\" has no build index");
+			internal Info(string sceneName, Obsolete obsolete = Obsolete.No) {
+               	SceneName = sceneName;
+				Obsolete = obsolete;
+				switch(Obsolete) {
+				case Obsolete.No:
+                	State = isLoaded ? State.Loaded : State.Unloaded;
+                	Assert.IsTrue(SceneUtility.GetBuildIndexByScenePath(SceneName) >= 0, "Scene \"" + sceneName + "\" has no build index");
+					break;
+				case Obsolete.Yes:
+                	State = State.Unloaded;
+					Assert.IsNotNull(AllBridges); // Fetch AllBridges at least once, which ensures no bridge refers to obsolete chunks.
+					break;
+				}
             }
             public Scene? GetSceneIfLoaded() {
                 var s = SceneManager.GetSceneByName(SceneName); // NOTE: Only searches in loaded scenes !
@@ -76,6 +94,24 @@ namespace Se {
                 return cachedInfos;
             }
         }
+		static ChunkBridge[] cachedAllBridges = null;
+		public static ChunkBridge[] AllBridges {
+			get {
+				if (cachedAllBridges == null) {
+					cachedAllBridges = FindObjectsOfType<ChunkBridge> ();
+					// Ensure that no bridge refers to obsolete chunks
+					foreach(var b in cachedAllBridges) {
+						foreach (var c in b.ChunksToLoad) {
+							Assert.AreNotEqual (
+								Infos [c].Obsolete, Obsolete.Yes, 
+								"ChunkBridge \""+b.gameObject.name+"\" refers to an obsolete ChunkID ("+c+")!"
+							);
+						}
+					}
+				}
+				return cachedAllBridges;
+			}
+		}
 
         static void assertAllChunksHaveMatchingScene() {
             bool ok = true;
@@ -85,9 +121,7 @@ namespace Se {
                     Debug.LogError ("ChunkID " + c + " does NOT have a matching scene name!");
                 }
             }
-            if (!ok) {
-                Application.Quit (); // FIXME replace by Exit.If().
-            }
+			Exit.If (!ok, "All ChunkIDs must have a matching scene name!");
         }
             
         static Chunks cachedInstance = null;
