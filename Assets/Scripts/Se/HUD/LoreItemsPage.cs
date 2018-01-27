@@ -26,7 +26,7 @@ namespace Se {
 				loreGameObject.GetComponent<Button>().onClick.AddListener(delegate{ShowImage(id);});
 				loreGameObject.GetComponent<Button>().interactable = false;
 
-				foreach (int j in GameSaveData.GetLoreItems()) {
+				foreach (int j in CurrentGameSaveData.Data.LoreItems) {
 					if (j == id) {
 						loreGameObject.GetComponent<Button>().interactable = true;
 						break;

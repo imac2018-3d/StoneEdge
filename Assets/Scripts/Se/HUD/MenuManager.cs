@@ -54,8 +54,8 @@ namespace Se {
 		public void LoadGame(bool isNew) {
 			gameStarted = true;
 			ResumeGame ();
-			if (isNew) { GameSaveData.NewGame (); }
-			else { GameSaveData.LoadGame(); }
+			if (isNew) { CurrentGameSaveData.NewGame (); }
+			else { CurrentGameSaveData.LoadGame(); }
 			GameState.Resume ();
 		}
 			
