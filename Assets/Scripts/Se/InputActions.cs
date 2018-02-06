@@ -33,7 +33,7 @@ namespace Se {
 		//
 		// The following initializations are just "reasonable defaults" for starting with; they are supposedly overwritten
 		// by settings when the game loads. Also, some of said "reasonable default" might be weird and subject to change.
-		public ButtonBinding MenuBack = new ButtonBinding(KeyCode.Escape, XbButton.B, KeyCode.Backspace);
+		public ButtonBinding MenuBack = new ButtonBinding(KeyCode.Backspace, XbButton.B);
 		public ButtonBinding MenuConfirm = new ButtonBinding(KeyCode.Return, XbButton.A, KeyCode.Space);
 		public ButtonBinding PauseMenu = new ButtonBinding(KeyCode.Escape, XbButton.Start);
 		public ButtonBinding Jump = new ButtonBinding(KeyCode.Space, XbButton.A);

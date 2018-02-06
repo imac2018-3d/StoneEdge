@@ -346,7 +346,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &2059148676
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,38 +358,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f6ffc596c26fc3f478a375619aff4650, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MenuBackBinding:
-    Keyboard: 27
-    XboxController: 1
-    ExtraAliases: 08000000
-  MenuConfirmBinding:
-    Keyboard: 13
-    XboxController: 0
-    ExtraAliases: 20000000
-  PauseMenuBinding:
-    Keyboard: 27
-    XboxController: 7
-    ExtraAliases: 
-  JumpBinding:
-    Keyboard: 32
-    XboxController: 0
-    ExtraAliases: 
-  DodgeBinding:
-    Keyboard: 304
-    XboxController: 5
-    ExtraAliases: 
-  BasicAttackBinding:
-    Keyboard: 102
-    XboxController: 2
-    ExtraAliases: 
-  MagnetImpactBinding:
-    Keyboard: 101
-    XboxController: 1
-    ExtraAliases: 
-  JumpQuakeBinding:
-    Keyboard: 97
-    XboxController: 3
-    ExtraAliases: 
 --- !u!4 &2059148677
 Transform:
   m_ObjectHideFlags: 0
