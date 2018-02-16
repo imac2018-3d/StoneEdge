@@ -11,6 +11,8 @@ namespace Se {
 		public GameObject MainMenu;
 		public GameObject PauseMenu;
 		public AudioResource AmbientSound;
+		public AudioResource Music;
+		public AudioResource ActionSound;
 
 		private GameObject currentMenu;
 		private GameObject lastMenu;
@@ -21,7 +23,9 @@ namespace Se {
 			ShowMenu (MainMenu);
 			gameStarted = false;
 
-			AmbientSound.Play(GetComponent<AudioSource>());
+			Music.Play(GetComponents<AudioSource>()[0]);
+			AmbientSound.SetSource(GetComponents<AudioSource> () [1]);
+			ActionSound.SetSource (GetComponents<AudioSource> () [2]);
 		}
 
 		public void Update() {
