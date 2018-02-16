@@ -10,6 +10,7 @@ namespace Se {
 		public GameObject[] Menus;
 		public GameObject MainMenu;
 		public GameObject PauseMenu;
+		public AudioResource AmbientSound;
 
 		private GameObject currentMenu;
 		private GameObject lastMenu;
@@ -19,6 +20,8 @@ namespace Se {
 			GameState.Pause ();
 			ShowMenu (MainMenu);
 			gameStarted = false;
+
+			AmbientSound.Play(GetComponent<AudioSource>());
 		}
 
 		public void Update() {
