@@ -19,7 +19,6 @@ namespace Se {
 		public InputField JumpQuake;
 
 		private List<KeyCode> reservedKeyboardInputs = new List<KeyCode> { KeyCode.Backspace, KeyCode.Return, KeyCode.Escape };
-		private MenuManager menuManager;
 	
 		private KeyCode newJump;
 		private KeyCode newDodge;
@@ -33,7 +32,6 @@ namespace Se {
 
 		// Use this for initialization
 		void Start () {
-			menuManager = GetComponentInParent<MenuManager> ();
 			var resolutions = new List<String>();
 			foreach (var resolution in Screen.resolutions) {
 				resolutions.Add (resolution.ToString());
@@ -43,40 +41,42 @@ namespace Se {
 
 			Windowed.isOn = !Screen.fullScreen;
 
-			AmbientAudioVolume.value = menuManager.AmbientSound.volume;
+			CurrentUserSettings.LoadSettings (GetComponentInParent<MenuManager>());
+
+			AmbientAudioVolume.value = CurrentUserSettings.Data.AmbientVolume;
 			AmbientAudioVolume.minValue = 0.0f;
 			AmbientAudioVolume.maxValue = 1.0f;
-			newAmbientVolume = menuManager.AmbientSound.volume;
+			newAmbientVolume = AmbientAudioVolume.value;
 
-			ActionAudioVolume.value = menuManager.ActionSound.volume;
+			ActionAudioVolume.value = CurrentUserSettings.Data.ActionVolume;
 			ActionAudioVolume.minValue = 0.0f;
 			ActionAudioVolume.maxValue = 1.0f;
-			newActionVolume = menuManager.ActionSound.volume;
+			newActionVolume = ActionAudioVolume.value;
 
-			MusicAudioVolume.value = menuManager.Music.volume;
+			MusicAudioVolume.value = CurrentUserSettings.Data.MusicVolume;
 			MusicAudioVolume.minValue = 0.0f;
 			MusicAudioVolume.maxValue = 1.0f;
-			newMusicVolume = menuManager.Music.volume;
+			newMusicVolume = MusicAudioVolume.value;
 
 
-			Jump.text = InputActions.Bindings.Jump.Keyboard.ToString();
-			newJump = InputActions.Bindings.Jump.Keyboard;
+			Jump.text = CurrentUserSettings.Data.KeyboardJump;
+			newJump = (KeyCode)System.Enum.Parse (typeof(KeyCode), Jump.text);
 			reservedKeyboardInputs.Add (newJump);
 
-			Dodge.text = InputActions.Bindings.Dodge.Keyboard.ToString();
-			newDodge = InputActions.Bindings.Dodge.Keyboard;
+			Dodge.text = CurrentUserSettings.Data.KeyboardDodge;
+			newDodge = (KeyCode)System.Enum.Parse (typeof(KeyCode), Dodge.text);
 			reservedKeyboardInputs.Add (newDodge);
 
-			BasicAttack.text = InputActions.Bindings.BasicAttack.Keyboard.ToString();
-			newBasicAttack = InputActions.Bindings.BasicAttack.Keyboard;
+			BasicAttack.text = CurrentUserSettings.Data.KeyboardBasicAttack;
+			newBasicAttack = (KeyCode)System.Enum.Parse (typeof(KeyCode), BasicAttack.text);
 			reservedKeyboardInputs.Add (newBasicAttack);
 
-			MagnetImpact.text = InputActions.Bindings.MagnetImpact.Keyboard.ToString();
-			newMagnetImpact = InputActions.Bindings.MagnetImpact.Keyboard;
+			MagnetImpact.text = CurrentUserSettings.Data.KeyboardMagnetImpact;
+			newMagnetImpact = (KeyCode)System.Enum.Parse (typeof(KeyCode), MagnetImpact.text);
 			reservedKeyboardInputs.Add (newMagnetImpact);
 
-			JumpQuake.text = InputActions.Bindings.JumpQuake.Keyboard.ToString();
-			newJumpQuake = InputActions.Bindings.JumpQuake.Keyboard;
+			JumpQuake.text = CurrentUserSettings.Data.KeyboardJumpQuake;
+			newJumpQuake = (KeyCode)System.Enum.Parse (typeof(KeyCode), JumpQuake.text);
 			reservedKeyboardInputs.Add (newJumpQuake);
 		}
 		
@@ -149,9 +149,17 @@ namespace Se {
 		public void SaveSettings() {
 			InputActions.Bindings.BasicAttack.Keyboard = newBasicAttack;
 
-			menuManager.AmbientSound.SetVolume(newAmbientVolume);
-			menuManager.ActionSound.SetVolume(newActionVolume);
-			menuManager.Music.SetVolume(newMusicVolume);
+			CurrentUserSettings.SetAmbientVolume(newAmbientVolume);
+			CurrentUserSettings.SetActionVolume (newActionVolume);
+			CurrentUserSettings.SetMusicVolume (newMusicVolume);
+
+			CurrentUserSettings.SetKeyboardJump (newJump.ToString());
+			CurrentUserSettings.SetKeyboardDodge (newDodge.ToString());
+			CurrentUserSettings.SetKeyboardBasicAttack (newBasicAttack.ToString());
+			CurrentUserSettings.SetKeyboardMagnetImpact (newMagnetImpact.ToString());
+			CurrentUserSettings.SetKeyboardJumpQuake (newJumpQuake.ToString());
+
+			CurrentUserSettings.Save ();
 		}
 	}
 }

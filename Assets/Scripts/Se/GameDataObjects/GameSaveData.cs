@@ -50,7 +50,6 @@ namespace Se {
 		public static void LoadGame() {
 			string json = File.ReadAllText (SavePath);
 			Data = JsonUtility.FromJson<GameSaveData>(json);
-			Debug.Log (Data.LoreItems);
 		}
 	}
 }

@@ -60,9 +60,14 @@ namespace Se {
 		public void LoadGame(bool isNew) {
 			gameStarted = true;
 			ResumeGame ();
-			if (isNew) { CurrentGameSaveData.NewGame (); }
-			else { CurrentGameSaveData.LoadGame(); }
+			if (isNew) { 
+				CurrentGameSaveData.NewGame ();
+			}
+			else { 
+				CurrentGameSaveData.LoadGame();
+			}
 			GameState.Resume ();
+
 		}
 			
 		public void ExitGame() {
