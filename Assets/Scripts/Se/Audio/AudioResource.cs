@@ -5,10 +5,16 @@ using System.Collections;
 public class AudioResource : ScriptableObject {
 	public AudioClip sample;
 	public float volume;
-	public void Play(AudioSource source)
+	public AudioSource source;
+	public void Play(AudioSource newSource)
 	{
+		source = newSource;
 		source.clip = sample;
 		source.volume = volume;
 		source.Play();
+	}
+
+	public void SetVolume(float newVolume) {
+		source.volume = newVolume;
 	}
 }

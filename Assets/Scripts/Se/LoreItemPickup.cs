@@ -14,9 +14,8 @@ namespace Se {
 			var hero = cld.gameObject.GetComponent<Hero> ();
 			if (hero == null)
 				return;
-			// Adding to a HashSet is fine because the key is always only present once.
-			Assert.AreEqual (CurrentGameSaveData.Data.LoreItems.GetType(), typeof(HashSet<int>));
-			bool wasAlreadyAcquired = !CurrentGameSaveData.Data.LoreItems.Add (ID);
+			Assert.AreEqual (CurrentGameSaveData.Data.LoreItems.GetType(), typeof(List<int>));
+			bool wasAlreadyAcquired = !CurrentGameSaveData.Data.LoreItems.Contains(ID);
 			Debug.Log ("Acquired Lore Item \""+gameObject.name+"\" (ID:"+ID+")" + (wasAlreadyAcquired ? " (was already acquired)" : ""));
 			// NOTE: For now, don't destroy the object. Pretend that the guardian has memorized the text.
 		}

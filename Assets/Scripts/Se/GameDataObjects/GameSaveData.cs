@@ -8,7 +8,7 @@ namespace Se {
 	[Serializable]
 	public struct GameSaveData {
 		public int LastCheckpoint;
-		public HashSet<int> LoreItems; // HashSet ensure uniqueness of values.
+		public List<int> LoreItems;
 		public bool HasAcquiredMagnetImpact;
 		public bool HasAcquiredJumpQuake;
 
@@ -50,7 +50,7 @@ namespace Se {
 		public static void LoadGame() {
 			string json = File.ReadAllText (SavePath);
 			Data = JsonUtility.FromJson<GameSaveData>(json);
-			Debug.Log (Data);
+			Debug.Log (Data.LoreItems);
 		}
 	}
 }

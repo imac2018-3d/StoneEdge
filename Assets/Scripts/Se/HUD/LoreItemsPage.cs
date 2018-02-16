@@ -2,35 +2,39 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Se {
 	
 	public class LoreItemsPage : MonoBehaviour {
 
-		public GameObject LoreParent;
-		public GameObject LorePrefab;
+		public List<GameObject> LoreButtons;
 		public GameObject LoreImage;
 		public List<Texture> Images;
+	
 
 		public void Start () {
 			foreach(var lore in LoreItemManager.Lores) {
+				/*
 				GameObject loreGameObject = Instantiate(LorePrefab) as GameObject;
-				Debug.Log (lore.Key);
+				int id = lore.Key;
 				loreGameObject.transform.SetParent(LoreParent.transform);
 				loreGameObject.GetComponentInChildren<Text> ().text = lore.Value.Text;
-				loreGameObject.transform.localPosition = new Vector3 (loreGameObject.transform.parent.localPosition.x + 250,
-																	  loreGameObject.transform.parent.localPosition.y + lore.Key*50,
-																	  loreGameObject.transform.parent.localPosition.z);
+				Vector3 newPosition = new Vector3 (loreGameObject.transform.parent.localPosition.x + 250,
+												   loreGameObject.transform.parent.localPosition.y + id*50,
+												   loreGameObject.transform.parent.localPosition.z);
+				loreGameObject.transform.localPosition = newPosition;
+				Debug.Log (loreGameObject.transform.localPosition);
 				loreGameObject.transform.localScale = new Vector3(1, 1, 1);
-				int id = lore.Key;
 				loreGameObject.GetComponent<Button>().onClick.AddListener(delegate{ShowImage(id);});
 				loreGameObject.GetComponent<Button>().interactable = false;
-
-				foreach (int j in CurrentGameSaveData.Data.LoreItems) {
-					if (j == id) {
-						loreGameObject.GetComponent<Button>().interactable = true;
-						break;
+				*/
+				int id = lore.Key;
+				if (CurrentGameSaveData.Data.LoreItems != null) {
+					foreach (int j in CurrentGameSaveData.Data.LoreItems.Where(d => d == id)) {
+						LoreButtons[id].GetComponent<Button> ().interactable = true;
 					}
+					LoreButtons[id].GetComponent<Button>().onClick.AddListener(delegate{ShowImage(id);});
 				}
 			}
 		}
