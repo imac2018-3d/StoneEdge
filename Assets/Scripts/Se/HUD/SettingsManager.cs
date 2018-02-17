@@ -3,28 +3,42 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Utils;
 
 namespace Se {
 	public class SettingsManager : MonoBehaviour {
 
 		public Dropdown ScreenResolution;
 		public Toggle Windowed;
+
 		public Slider AmbientAudioVolume;
 		public Slider MusicAudioVolume;
 		public Slider ActionAudioVolume;
+
 		public InputField Jump;
 		public InputField Dodge;
 		public InputField BasicAttack;
 		public InputField MagnetImpact;
 		public InputField JumpQuake;
+		public InputField JumpXbox;
+		public InputField DodgeXbox;
+		public InputField BasicAttackXbox;
+		public InputField MagnetImpactXbox;
+		public InputField JumpQuakeXbox;
 
 		private List<KeyCode> reservedKeyboardInputs = new List<KeyCode> { KeyCode.Backspace, KeyCode.Return, KeyCode.Escape };
+		private List<XbButton> reservedXboxControllerInputs = new List<XbButton> { XbButton.Start };
 	
 		private KeyCode newJump;
 		private KeyCode newDodge;
 		private KeyCode newBasicAttack;
 		private KeyCode newMagnetImpact;
 		private KeyCode newJumpQuake;
+		private XbButton newJumpXbox;
+		private XbButton newDodgeXbox;
+		private XbButton newBasicAttackXbox;
+		private XbButton newMagnetImpactXbox;
+		private XbButton newJumpQuakeXbox;
 		private float newAmbientVolume;
 		private float newMusicVolume;
 		private float newActionVolume;
@@ -78,47 +92,107 @@ namespace Se {
 			JumpQuake.text = CurrentUserSettings.Data.KeyboardJumpQuake;
 			newJumpQuake = (KeyCode)System.Enum.Parse (typeof(KeyCode), JumpQuake.text);
 			reservedKeyboardInputs.Add (newJumpQuake);
+
+			JumpXbox.text = CurrentUserSettings.Data.XbButtonJump;
+			newJumpXbox = (XbButton)System.Enum.Parse (typeof(XbButton), JumpXbox.text);
+			reservedXboxControllerInputs.Add (newJumpXbox);
+
+			DodgeXbox.text = CurrentUserSettings.Data.KeyboardDodge;
+			newDodgeXbox = (XbButton)System.Enum.Parse (typeof(XbButton), DodgeXbox.text);
+			reservedXboxControllerInputs.Add (newDodgeXbox);
+
+			BasicAttackXbox.text = CurrentUserSettings.Data.KeyboardBasicAttack;
+			newBasicAttackXbox = (XbButton)System.Enum.Parse (typeof(XbButton), BasicAttackXbox.text);
+			reservedXboxControllerInputs.Add (newBasicAttackXbox);
+
+			MagnetImpactXbox.text = CurrentUserSettings.Data.KeyboardMagnetImpact;
+			newMagnetImpactXbox = (XbButton)System.Enum.Parse (typeof(XbButton), MagnetImpactXbox.text);
+			reservedXboxControllerInputs.Add (newMagnetImpactXbox);
+
+			JumpQuakeXbox.text = CurrentUserSettings.Data.KeyboardJumpQuake;
+			newJumpQuakeXbox = (XbButton)System.Enum.Parse (typeof(XbButton), JumpQuakeXbox.text);
+			reservedXboxControllerInputs.Add (newJumpQuakeXbox);
 		}
 		
 		// Update is called once per frame
 		void Update () {
-			foreach(KeyCode kcode in Enum.GetValues(typeof(KeyCode)))
-			{
+			foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode))) {
 				if (Input.GetKeyDown (kcode)) {
 					if (!reservedKeyboardInputs.Contains (kcode)) {
 						if (Jump.isFocused) {
-							reservedKeyboardInputs.Remove(newJump);
+							reservedKeyboardInputs.Remove (newJump);
 							newJump = kcode;
 							Jump.text = newJump.ToString ();
 							reservedKeyboardInputs.Add (newJump);
 						}
 
 						if (Dodge.isFocused) {
-							reservedKeyboardInputs.Remove(newDodge);
+							reservedKeyboardInputs.Remove (newDodge);
 							newDodge = kcode;
 							Dodge.text = newDodge.ToString ();
 							reservedKeyboardInputs.Add (newDodge);
 						}
 
 						if (BasicAttack.isFocused) {
-							reservedKeyboardInputs.Remove(newBasicAttack);
+							reservedKeyboardInputs.Remove (newBasicAttack);
 							newBasicAttack = kcode;
 							BasicAttack.text = newBasicAttack.ToString ();
 							reservedKeyboardInputs.Add (newBasicAttack);
 						}
 
 						if (MagnetImpact.isFocused) {
-							reservedKeyboardInputs.Remove(newMagnetImpact);
+							reservedKeyboardInputs.Remove (newMagnetImpact);
 							newMagnetImpact = kcode;
 							MagnetImpact.text = newMagnetImpact.ToString ();
 							reservedKeyboardInputs.Add (newMagnetImpact);
 						}
 
 						if (JumpQuake.isFocused) {
-							reservedKeyboardInputs.Remove(newJumpQuake);
+							reservedKeyboardInputs.Remove (newJumpQuake);
 							newJumpQuake = kcode;
 							JumpQuake.text = newJumpQuake.ToString ();
 							reservedKeyboardInputs.Add (newJumpQuake);
+						}
+					}
+				}
+			}
+
+			foreach(XbButton button in Enum.GetValues(typeof(XbButton))) {
+				if (XbInput.GetButtonDown(button)) {
+					if (!reservedXboxControllerInputs.Contains (button)) {
+						if (JumpXbox.isFocused) {
+							reservedXboxControllerInputs.Remove(newJumpXbox);
+							newJumpXbox = button;
+							JumpXbox.text = newJumpXbox.ToString ();
+							reservedXboxControllerInputs.Add (newJumpXbox);
+						}
+
+						if (DodgeXbox.isFocused) {
+							reservedXboxControllerInputs.Remove(newDodgeXbox);
+							newDodgeXbox = button;
+							DodgeXbox.text = newDodgeXbox.ToString ();
+							reservedXboxControllerInputs.Add (newDodgeXbox);
+						}
+
+						if (BasicAttackXbox.isFocused) {
+							reservedXboxControllerInputs.Remove(newBasicAttackXbox);
+							newBasicAttackXbox = button;
+							BasicAttackXbox.text = newBasicAttackXbox.ToString ();
+							reservedXboxControllerInputs.Add (newBasicAttackXbox);
+						}
+
+						if (MagnetImpactXbox.isFocused) {
+							reservedXboxControllerInputs.Remove(newMagnetImpactXbox);
+							newMagnetImpactXbox = button;
+							MagnetImpactXbox.text = newMagnetImpactXbox.ToString ();
+							reservedXboxControllerInputs.Add (newMagnetImpactXbox);
+						}
+
+						if (JumpQuakeXbox.isFocused) {
+							reservedXboxControllerInputs.Remove(newJumpQuakeXbox);
+							newJumpQuakeXbox = button;
+							JumpQuakeXbox.text = newJumpQuakeXbox.ToString ();
+							reservedXboxControllerInputs.Add (newJumpQuakeXbox);
 						}
 					}
 				}
@@ -158,6 +232,12 @@ namespace Se {
 			CurrentUserSettings.SetKeyboardBasicAttack (newBasicAttack.ToString());
 			CurrentUserSettings.SetKeyboardMagnetImpact (newMagnetImpact.ToString());
 			CurrentUserSettings.SetKeyboardJumpQuake (newJumpQuake.ToString());
+
+			CurrentUserSettings.SetXbButtonJump (newJumpXbox.ToString());
+			CurrentUserSettings.SetXbButtonDodge (newDodgeXbox.ToString());
+			CurrentUserSettings.SetXbButtonBasicAttack (newBasicAttackXbox.ToString());
+			CurrentUserSettings.SetXbButtonMagnetImpact (newMagnetImpactXbox.ToString());
+			CurrentUserSettings.SetXbButtonJumpQuake (newJumpQuakeXbox.ToString());
 
 			CurrentUserSettings.Save ();
 		}
