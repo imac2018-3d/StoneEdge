@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -116,13 +116,13 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 611261908}
+  - component: {fileID: 611261913}
   - component: {fileID: 611261912}
   - component: {fileID: 611261911}
   - component: {fileID: 611261910}
   - component: {fileID: 611261909}
-  - component: {fileID: 611261913}
   m_Layer: 0
-  m_Name: camera_avatar
+  m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -139,7 +139,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!81 &611261909
 AudioListener:
@@ -209,8 +209,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6496da444f5bd4f9ab78446b87aa94c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  target: {fileID: 1087953776}
-  altitude: 3
+  Target: {fileID: 1087953776}
+  Altitude: 4
 --- !u!1 &981794022
 GameObject:
   m_ObjectHideFlags: 0
@@ -280,7 +280,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1007576144
 GameObject:
@@ -369,13 +369,13 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1087953780}
+  - component: {fileID: 1087953781}
   - component: {fileID: 1087953779}
   - component: {fileID: 1087953778}
   - component: {fileID: 1087953777}
-  - component: {fileID: 1087953781}
   - component: {fileID: 1087953782}
   m_Layer: 0
-  m_Name: avatar
+  m_Name: CameraTargetTest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

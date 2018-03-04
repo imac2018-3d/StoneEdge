@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class avatar : MonoBehaviour {
+public class CameraTargetTest : MonoBehaviour {
 	public float movementSpeed = 10;
 	public float turningSpeed = 10;
 
