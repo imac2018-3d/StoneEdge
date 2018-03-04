@@ -26,7 +26,7 @@ namespace Se {
 		public bool dodging;
 
 		private int maxLife = 5;
-		public int life = maxLife;
+		public int life = 5;
 
 		void Start () {
 			fsm.AssertNotNull ();
