@@ -47,8 +47,6 @@ namespace Se {
 		Test1 = 101,
 		Test2 = 102,
 		Test3 = 103,
-		Test4 = 104,
-		Test5 = 105,
     }
 
     public class Chunks : MonoBehaviour {
@@ -74,8 +72,6 @@ namespace Se {
 				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.Yes) },
 				{ ChunkID.Test2, new Info("ChunkTest3", Obsolete.Yes) },
 				{ ChunkID.Test3, new Info("ChunkTest4", Obsolete.Yes) },
-				{ ChunkID.Test4, new Info("ChunkTest5", Obsolete.Yes) },
-				{ ChunkID.Test5, new Info("ChunkTest6", Obsolete.Yes) },
             };
         }
 
