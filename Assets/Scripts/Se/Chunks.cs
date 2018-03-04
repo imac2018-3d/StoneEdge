@@ -23,8 +23,6 @@ using Utils;
 
 namespace Se {
 
-	// TODO: Set these to actual chunk names for our game! Jungle Desert Sea and Lava were only for testing.
-	// It's fine to remove Jungle Desert Sea and Lava.
 	// IT IS NOT FINE to change the value of, or remove, a true chunk of the game, because it would break everything.
 	// 
 	// Therefore, please only add new chunks, with a unique value, 
