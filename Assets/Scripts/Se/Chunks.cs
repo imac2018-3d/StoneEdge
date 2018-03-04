@@ -30,10 +30,25 @@ namespace Se {
 	// Therefore, please only add new chunks, with a unique value, 
 	// and DO NOT remove any existing one. Only mark them as obsolete in the loadInfos() method.
     public enum ChunkID {
-        Jungle = 1,
-        Desert = 2,
-        Sea = 3,
-        Lava = 4,
+		TempleForest = 5,
+		Forest = 6,
+		Nexus = 7,
+		Desert = 8,
+		DescenteDesert = 9,
+		TempleDesert = 10,
+		Canyon = 11,
+		Bridge = 12,
+		Plain = 13,
+		Village = 14,
+		TempleVillage = 15,
+		Mountain = 16,
+
+		Test0 = 100,
+		Test1 = 101,
+		Test2 = 102,
+		Test3 = 103,
+		Test4 = 104,
+		Test5 = 105,
     }
 
     public class Chunks : MonoBehaviour {
@@ -42,10 +57,25 @@ namespace Se {
 
         static Dictionary<ChunkID, Info> loadInfos() {
             return new Dictionary<ChunkID, Info>() {
-				{ ChunkID.Jungle, new Info("Jungle", Obsolete.Yes) },
-				{ ChunkID.Desert, new Info("Desert", Obsolete.Yes) },
-				{ ChunkID.Sea, new Info("Sea", Obsolete.Yes) },
-				{ ChunkID.Lava, new Info("Lava", Obsolete.Yes) },
+				{ ChunkID.TempleForest, new Info("TempleForest") },
+				{ ChunkID.Forest, new Info("Forest") },
+				{ ChunkID.Nexus, new Info("Nexus") },
+				{ ChunkID.Desert, new Info("Desert") },
+				{ ChunkID.DescenteDesert, new Info("DescenteDesert") },
+				{ ChunkID.TempleDesert, new Info("TempleDesert") },
+				{ ChunkID.Canyon, new Info("Canyon") },
+				{ ChunkID.Bridge, new Info("Bridge") },
+				{ ChunkID.Plain, new Info("Plain") },
+				{ ChunkID.Village, new Info("Village") },
+				{ ChunkID.TempleVillage, new Info("TempleVillage") },
+				{ ChunkID.Mountain, new Info("Mountain") },
+
+				{ ChunkID.Test0, new Info("ChunkTest0", Obsolete.Yes) },
+				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.Yes) },
+				{ ChunkID.Test2, new Info("ChunkTest3", Obsolete.Yes) },
+				{ ChunkID.Test3, new Info("ChunkTest4", Obsolete.Yes) },
+				{ ChunkID.Test4, new Info("ChunkTest5", Obsolete.Yes) },
+				{ ChunkID.Test5, new Info("ChunkTest6", Obsolete.Yes) },
             };
         }
 
