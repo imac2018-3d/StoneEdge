@@ -7,6 +7,7 @@ public class PlayerAttack : MonoBehaviour {
 	private Rigidbody rb;
 	private GameObject target;
 
+
 	void Start () {
 		rb = GetComponent<Rigidbody> ();
 		target = GameObject.Find ("Ennemy");
