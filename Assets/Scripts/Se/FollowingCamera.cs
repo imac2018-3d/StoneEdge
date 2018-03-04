@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
+// TODO: Camera :
+// - Yaw, Pitch, Current distance from target;
+// - Min Max Distances from target.
+// - Map coords.
+using Se;
+
 public class FollowingCamera : MonoBehaviour {
 	public GameObject Target;
 	public float Altitude = 4;
@@ -11,6 +17,20 @@ public class FollowingCamera : MonoBehaviour {
 
 	public Vector3 SelfToTargetVector {
 		get { return Target.transform.position - transform.position; }
+	}
+
+	public Vector3 MapMovementInput(Vector2 input) {
+		var right = transform.right;
+		var forward = transform.forward;
+		right.y = 0;
+		forward.y = 0;
+		right.Normalize ();
+		forward.Normalize ();
+		return right * input.x + forward * input.y;
+	}
+
+	public Vector3 CurrentMovementDirectionOfTarget {
+		get { return MapMovementInput (InputActions.MovementDirection); }
 	}
 
 	void Start () {
