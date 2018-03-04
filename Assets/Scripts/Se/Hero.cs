@@ -10,9 +10,11 @@ namespace Se {
 
 		public Rigidbody rb;  // containt the hero's informations
 		public bool grounded;
-		public float lowingSpeed = 3;
+		public float speed = 15f;
+		public float speedRotation = 30f;
 
-		public float fallMultiplier = 3.5f; // the multiplier to make the falling down part quicker than the jumping part
+		public float jumpValue = 80.0f;
+		public float fallMultiplier = 4.5f; // the multiplier to make the falling down part quicker than the jumping part
 		public float lowJumpMultiplier = 3f; // The multiplier to make the jumping part lower than the fall down
 
 		public bool playerEnabledToMoveMagnetImpact = true;
@@ -22,6 +24,9 @@ namespace Se {
 
 		public bool rightDodge;
 		public bool dodging;
+
+		private int maxLife = 5;
+		public int life = maxLife;
 
 		void Start () {
 			fsm.AssertNotNull ();
@@ -42,6 +47,8 @@ namespace Se {
 		}
 
 		void Update() {
+			rb.constraints = RigidbodyConstraints.FreezeRotation;  // Used to avoid the character to fall down in an uphill
+
 				// To do a better jump
 			if(rb.velocity.y < 0) {
 				rb.velocity += Vector3.up * Physics.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
@@ -67,6 +74,14 @@ namespace Se {
 		void EnablingToMovePunch() {
 			punchGo.SetActive (false);
 			playerEnabledToMovePunch = true;
+		}
+
+		void FullLife() {
+			life = maxLife;
+		}
+
+		void LooseLife() {
+			life--;
 		}
 
 	}
@@ -96,35 +111,45 @@ namespace Se {
 					return new Punch ();
 				}else if (go.GetComponent<Hero> ().grounded && Input.GetKeyDown (KeyCode.C)) {
 					return new MagnetImpact ();
-				}else if (Input.GetKeyDown (KeyCode.N)) {
-					go.GetComponent<Hero> ().rightDodge = true;
-					return new Dodge ();
-				}else if (Input.GetKeyDown (KeyCode.B)) {
-					go.GetComponent<Hero> ().rightDodge = false;
+				}else if (InputActions.Dodges) {
 					return new Dodge ();
 				}
 				return this;
 			}
 
 			public override FsmState OnFixedUpdate (GameObject go) {
-				go.GetComponent<Hero>().rb.constraints = RigidbodyConstraints.FreezeRotation;  // Used to avoid the character to fall down in an uphill
-
 				float moveHorizontal = Input.GetAxis ("Horizontal");  // Get the horizontal keyboard arrows "forces"
 				float moveVertical = Input.GetAxis ("Vertical");  // Get the vertical keyboard arrows "forces"
 
-				Vector3 movement = new Vector3 (moveHorizontal / go.GetComponent<Hero> ().lowingSpeed, 0.0f, moveVertical / go.GetComponent<Hero> ().lowingSpeed);  // Create a vector to move the character 
+				Vector3 velocity = go.GetComponent<Hero> ().rb.velocity;
+				Vector3 movement = new Vector3 (moveHorizontal * go.GetComponent<Hero> ().speed, velocity.y, moveVertical * go.GetComponent<Hero> ().speed);  // Create a vector to move the character 
 
-				go.GetComponent<Hero>().rb.MovePosition (go.transform.position + movement);  // Move the character
+				go.GetComponent<Hero>().rb.velocity = movement;  // Move the character
+
+				Vector3 forward = go.GetComponent<Hero> ().rb.transform.forward;
+				forward = forward.normalized;
+				forward.y = 0f;
+
+				Vector3 directionTo = movement.normalized ;
+				directionTo = directionTo.normalized;
+				directionTo.y = 0f;
+
+				Vector3 between = Vector3.Lerp (forward, directionTo, 0.2f);
+				//Debug.Log ("Between : "+ between.x + ", " + between.y + ", " + between.z);
+				Quaternion reorientation = Quaternion.LookRotation (between, forward);
+				//reorientation.Set(reorientation.x, reorientation.y, 0f, reorientation.z);
+
+				//go.GetComponent<Hero> ().rb.rotation = reorientation;
+
 				return this;
 			}
 		}
 
 		public class Jump: FsmState {
 			private Vector3 jumpMovement;
-			public float jumpValue = 15.0f;
 
 			public override FsmState OnUpdate (GameObject go) {
-				jumpMovement = new Vector3 (0.0f, jumpValue, 0.0f);
+				jumpMovement = new Vector3 (0.0f, go.GetComponent<Hero> ().jumpValue, 0.0f);
 				go.GetComponent<Hero>().rb.AddForce(jumpMovement, ForceMode.Impulse);
 				return new Idle ();
 			}
@@ -132,7 +157,6 @@ namespace Se {
 
 		public class MagnetImpact: FsmState {
 			public override FsmState OnUpdate (GameObject go) {
-				// NOTE :: ORIENTATION A BOUGER EN FONCTION DE OU REGARDE LE HERO
 				go.GetComponent<Hero> ().playerEnabledToMoveMagnetImpact = false;
 				go.GetComponent<Hero>().magnetImpactGo.SetActive (true);
 				
@@ -142,7 +166,6 @@ namespace Se {
 
 		public class Punch: FsmState {
 			public override FsmState OnUpdate (GameObject go) {
-				// NOTE :: ORIENTATION A BOUGER EN FONCTION DE OU REGARDE LE HERO
 				go.GetComponent<Hero> ().playerEnabledToMovePunch = false;
 				go.GetComponent<Hero>().punchGo.SetActive (true);
 
@@ -151,17 +174,15 @@ namespace Se {
 		}
 
 		public class Dodge: FsmState {
-			public override FsmState OnUpdate (GameObject go) {
-				if(!go.GetComponent<Hero>().rightDodge){
-					var dodgeVectorMovement = Vector3.left * 20f; // CHANGER EN FONCTION DE OU REGARDE LE HERO
-					go.GetComponent<Hero>().rb.AddForce(dodgeVectorMovement, ForceMode.Impulse);
-					go.GetComponent<Hero> ().dodging = true;
-				}
-				if(go.GetComponent<Hero>().rightDodge){
-					var dodgeVectorMovement = Vector3.right * 20f; // CHANGER EN FONCTION DE OU REGARDE LE HERO
-					go.GetComponent<Hero>().rb.AddForce(dodgeVectorMovement, ForceMode.Impulse);
-					go.GetComponent<Hero> ().dodging = true;
-				}
+			public override FsmState OnFixedUpdate (GameObject go) {
+				float moveHorizontal = Input.GetAxis ("Horizontal");  // Get the horizontal keyboard arrows "forces"
+				float moveVertical = Input.GetAxis ("Vertical");  // Get the vertical keyboard arrows "forces"
+
+				Vector3 velocity = go.GetComponent<Hero> ().rb.velocity;
+				//Vector3 movement = new Vector3 (moveHorizontal * go.GetComponent<Hero> ().speed * 20, velocity.y, moveVertical * go.GetComponent<Hero> ().speed * 20);  // Create a vector to move the character 
+				Vector3 movement = new Vector3 (moveHorizontal * go.GetComponent<Hero> ().speed * 20, velocity.y, moveVertical * go.GetComponent<Hero> ().speed * 20);  // Create a vector to move the character 
+
+				go.GetComponent<Hero>().rb.velocity = movement;  // Move the character
 
 				return new Idle();
 			}

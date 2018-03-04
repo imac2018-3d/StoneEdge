@@ -13,6 +13,9 @@ namespace Se {
 		public float fallMultiplier = 3.5f; // the multiplier to make the falling down part quicker than the jumping part
 		public float lowJumpMultiplier = 3f; // The multiplier to make the jumping part lower than the fall down
 
+		public static int lifeMax = 3;
+		public int life = lifeMax;
+
 		void Start () {
 			rb = GetComponent<Rigidbody> ();
 			fsm.AssertNotNull ();
@@ -26,6 +29,10 @@ namespace Se {
 			}
 
 			fsm.OnUpdate (gameObject);
+		}
+
+		void looseLife() {
+			life--;
 		}
 	}
 	namespace EnemyStates {
