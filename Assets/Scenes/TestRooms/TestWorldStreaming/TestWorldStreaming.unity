@@ -445,6 +445,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 1848222728}
+  - component: {fileID: 1848222729}
   - component: {fileID: 1848222727}
   - component: {fileID: 1848222726}
   - component: {fileID: 1848222725}
@@ -526,6 +527,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 65, y: 0, z: 0}
+--- !u!114 &1848222729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1848222723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6496da444f5bd4f9ab78446b87aa94c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Target: {fileID: 2038271534}
+  Altitude: 4
 --- !u!1 &2038271534
 GameObject:
   m_ObjectHideFlags: 0
