@@ -1,14 +1,14 @@
-﻿// NOTE: This is a placeholder for the hero component.
-
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using Utils;
 
 namespace Se {
+
+	[RequireComponent(typeof(Rigidbody))]
 	public class Hero : MonoBehaviour {
 		Fsm fsm = new Fsm(new HeroStates.Idle());
 
-		public Rigidbody rb;  // containt the hero's informations
+		public Rigidbody rb;
 		public bool grounded;
 		public float speed = 15f;
 		public float speedRotation = 30f;

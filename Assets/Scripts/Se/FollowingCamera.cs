@@ -9,6 +9,8 @@ using UnityEngine.Assertions;
 // - Map coords.
 using Se;
 
+namespace Se {
+	
 public class FollowingCamera : MonoBehaviour {
 	public GameObject Target;
 	public float Altitude = 4;
@@ -64,7 +66,8 @@ public class FollowingCamera : MonoBehaviour {
 				altitudesSum += hit.point.y;
 			}
 		}
-		Assert.AreNotApproximatelyEqual (total, 0);
 		return altitudesSum / total;
 	}
 }
+
+} // namespace Se
