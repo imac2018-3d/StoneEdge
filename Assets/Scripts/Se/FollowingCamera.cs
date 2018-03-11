@@ -3,71 +3,67 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-// TODO: Camera :
-// - Yaw, Pitch, Current distance from target;
-// - Min Max Distances from target.
-// - Map coords.
 using Se;
 
 namespace Se {
-	
-public class FollowingCamera : MonoBehaviour {
-	public GameObject Target;
-	public float Altitude = 4;
+	public class FollowingCamera : MonoBehaviour {
 
-	float distance;
+		[Tooltip("GameObject to follow.")]
+		public Transform Target;
+		public float MinDistanceFromTarget = 2f;
+		public float MaxDistanceFromTarget = 8f;
+		public float YRotationSpeedFactor = 1f;
+		public float XRotationSpeedFactor = 1f;
 
-	public Vector3 SelfToTargetVector {
-		get { return Target.transform.position - transform.position; }
-	}
-
-	public Vector3 MapMovementInput(Vector2 input) {
-		var right = transform.right;
-		var forward = transform.forward;
-		right.y = 0;
-		forward.y = 0;
-		right.Normalize ();
-		forward.Normalize ();
-		return right * input.x + forward * input.y;
-	}
-
-	public Vector3 CurrentMovementDirectionOfTarget {
-		get { return MapMovementInput (InputActions.MovementDirection); }
-	}
-
-	void Start () {
-		Assert.IsNotNull (Target);
-		distance = SelfToTargetVector.magnitude;
-	}
-
-	void Update () {
-		transform.position = Target.transform.position + distance * (-SelfToTargetVector.normalized);
-
-		var avg = averageAltitude (4);
-		if (!(float.IsNaN (avg) || float.IsInfinity (avg))) {
-			transform.Translate (Vector3.up * (Altitude - (transform.position.y - avg)));
-		} else {
-			Debug.LogWarning ("averageAltitude() returned " + avg + "!");
+		void Awake () {
+			Assert.IsNotNull (Target);
 		}
 
-		transform.LookAt (Target.transform);
-	}
-
-	// Computes average altitude on multiples raycasts (casted from the line between avatar and camera)
-	float averageAltitude(int nbRays) {
-		int total = 0;
-		float altitudesSum = 0;
-		RaycastHit hit;
-		for (int i = 0; i < nbRays; ++i) {
-			var origin = transform.position + i * SelfToTargetVector / nbRays;
-			if (Physics.Raycast (origin, Vector3.down, out hit, 5)) {
-				Debug.DrawRay (origin, hit.point - origin, Color.red);
-				total += 1;
-				altitudesSum += hit.point.y;
+		public Vector3 SelfToTarget {
+			get { return Target.position - transform.position; }
+			set {
+				transform.position = Target.position - value;
+				transform.LookAt (Target.position);
 			}
 		}
-		return altitudesSum / total;
-	}
-}
+		public float DistanceFromTarget {
+			get { return SelfToTarget.magnitude; }
+			set { SelfToTarget = SelfToTarget.normalized * Mathf.Clamp(value, MinDistanceFromTarget, MaxDistanceFromTarget); }
+		}
 
+		void LateUpdate() { // NOTE: Not Update(), because otherwise there's stuttering.
+			// Cursor.lockState = CursorLockMode.Locked;
+			// Cursor.visible = false;
+
+			var distance = 10f;
+			var altitude = 3f;
+			var desired = Target.position - SelfToTarget.normalized * distance;
+			var avg = averageAltitude (4);
+			if (float.IsNaN (avg) || float.IsInfinity (avg)) {
+				Debug.LogWarning ("averageAltitude() returned " + avg + "!");
+			} else {
+				desired += Vector3.up * (altitude - (transform.position.y - avg));
+			}
+			transform.position = Vector3.Lerp (transform.position, desired, 0.05f);
+			var input = InputActions.CameraMovementDirection;
+			SelfToTarget = Quaternion.AngleAxis (input.x * Time.deltaTime * YRotationSpeedFactor, Vector3.up) * SelfToTarget;
+			SelfToTarget = Quaternion.AngleAxis (input.y * Time.deltaTime * XRotationSpeedFactor, transform.right) * SelfToTarget;
+		}
+
+		// Computes average altitude using multiples raycasts (from the line between target and camera)
+		float averageAltitude(int nbRays) {
+			int total = 0;
+			float altitudesSum = 0;
+			RaycastHit hit;
+			for (int i = 0; i < nbRays; ++i) {
+				var origin = transform.position + i * SelfToTarget / nbRays;
+				if (Physics.Raycast (origin, Vector3.down, out hit, 5)) {
+					Debug.DrawRay (origin, hit.point - origin, Color.red);
+					total += 1;
+					altitudesSum += hit.point.y;
+				}
+			}
+			return altitudesSum / (float) total;
+		}
+	}
 } // namespace Se

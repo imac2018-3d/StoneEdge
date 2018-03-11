@@ -61,13 +61,18 @@ namespace Se {
 		public static bool Pauses { get { return Bindings.PauseMenu.WasJustPressed; } }
 		public static bool Resumes { get { return Pauses; } }
 	
-		public static Vector2 MovementDirection { 
+		static Vector2 movementDirectionRaw { 
 			get {
 				var v = XbInput.GetAxis2D (XbAxis2D.LStick);
 				if (v != Vector2.zero) return v;
 				v = XbInput.GetAxis2D (XbAxis2D.DPad);
 				if (v != Vector2.zero) return v;
 				return new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+			}
+		}
+		public static Vector2 MovementDirection { 
+			get {
+				return Vector2.ClampMagnitude (movementDirectionRaw, 1f);
 			}
 		}
 		public static Vector2 CameraMovementDirection { 
