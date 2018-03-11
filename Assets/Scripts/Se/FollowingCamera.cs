@@ -32,8 +32,8 @@ namespace Se {
 		}
 
 		void LateUpdate() { // NOTE: Not Update(), because otherwise there's stuttering.
-			// Cursor.lockState = CursorLockMode.Locked;
-			// Cursor.visible = false;
+			Cursor.lockState = CursorLockMode.Locked;
+			Cursor.visible = false;
 
 			var distance = 10f;
 			var altitude = 3f;
