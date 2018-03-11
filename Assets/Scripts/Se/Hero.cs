@@ -67,7 +67,9 @@ namespace Se {
 		}
 
 		float lastPunchStartTime = 0f;
+
 		bool canPunch { get { return lastPunchStartTime==0f ? true : Time.time - lastPunchStartTime > PunchCooldownDuration; } }
+
 		public void doPunch() {
 			lastPunchStartTime = Time.time;
 			var go = GameObject.CreatePrimitive (PrimitiveType.Sphere);
