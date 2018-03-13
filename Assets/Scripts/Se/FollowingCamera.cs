@@ -14,6 +14,8 @@ namespace Se {
 		public float MaxDistanceFromTarget = 8f;
 		public float YRotationSpeedFactor = 1f;
 		public float XRotationSpeedFactor = 1f;
+		public float AltitudeHack = 3f;
+		public bool WantsToCaptureCursor;
 
 		void Awake () {
 			Assert.IsNotNull (Target);
@@ -32,17 +34,16 @@ namespace Se {
 		}
 
 		void LateUpdate() { // NOTE: Not Update(), because otherwise there's stuttering.
-			Cursor.lockState = CursorLockMode.Locked;
-			Cursor.visible = false;
+			Cursor.lockState = WantsToCaptureCursor ? CursorLockMode.Locked : CursorLockMode.None;
+			Cursor.visible = !WantsToCaptureCursor;
 
-			var distance = 10f;
-			var altitude = 3f;
-			var desired = Target.position - SelfToTarget.normalized * distance;
+			var distanceHack = MaxDistanceFromTarget;
+			var desired = Target.position - SelfToTarget.normalized * distanceHack;
 			var avg = averageAltitude (4);
 			if (float.IsNaN (avg) || float.IsInfinity (avg)) {
 				Debug.LogWarning ("averageAltitude() returned " + avg + "!");
 			} else {
-				desired += Vector3.up * (altitude - (transform.position.y - avg));
+				desired += Vector3.up * (AltitudeHack - (transform.position.y - avg));
 			}
 			transform.position = Vector3.Lerp (transform.position, desired, 0.05f);
 			var input = InputActions.CameraMovementDirection;
