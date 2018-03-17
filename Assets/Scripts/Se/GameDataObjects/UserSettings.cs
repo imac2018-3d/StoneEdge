@@ -61,6 +61,7 @@ namespace Se {
 		public static UserSettings Data;
 		public static readonly string JsonFileName = "UserSettings.json";
 		public static MenuManager MenuManager;
+		public static AudioManager AudioManager;
 
 		public static string SavePath {
 			get { 
@@ -80,6 +81,8 @@ namespace Se {
 				Data = new UserSettings ();
 			else
 				Data = JsonUtility.FromJson<UserSettings>(json);
+
+			AudioManager = AudioManager.GetInstance();
 
 			SetActionVolume(Data.ActionVolume);
 			SetAmbientVolume(Data.AmbientVolume);
@@ -140,17 +143,17 @@ namespace Se {
 
 		public static void SetAmbientVolume(float newVolume) {
 			Data.AmbientVolume = newVolume;
-			MenuManager.AmbientSound.SetVolume (newVolume);
+			AudioManager.AmbientSound.SetVolume (newVolume);
 		}
 
 		public static void SetActionVolume(float newVolume) {
 			Data.ActionVolume = newVolume;
-			MenuManager.ActionSound.SetVolume(newVolume);
+			AudioManager.ActionSound.SetVolume(newVolume);
 		}
 
 		public static void SetMusicVolume(float newVolume) {
 			Data.MusicVolume = newVolume;
-			MenuManager.Music.SetVolume(newVolume);
+			AudioManager.MusicSound.SetVolume(newVolume);
 		}
 			
 		public static void SetKeyboardJump(String newValue) {

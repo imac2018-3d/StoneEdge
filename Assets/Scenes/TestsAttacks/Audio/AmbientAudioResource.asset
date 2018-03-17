@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13229edc6d6c8c949a575c591956ef4b, type: 3}
   m_Name: AmbientAudioResource
   m_EditorClassIdentifier: 
-  sample: {fileID: 8300000, guid: a8d721e2e991a7246894c4a63ac11bb6, type: 3}
+  sample: {fileID: 8300000, guid: 26bce01b55c23704c9a7b32eb739b71d, type: 3}
   volume: 0.5
   source: {fileID: 0}

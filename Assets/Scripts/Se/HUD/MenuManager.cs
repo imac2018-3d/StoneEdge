@@ -10,22 +10,20 @@ namespace Se {
 		public GameObject[] Menus;
 		public GameObject MainMenu;
 		public GameObject PauseMenu;
-		public AudioResource AmbientSound;
-		public AudioResource Music;
-		public AudioResource ActionSound;
 
 		private GameObject currentMenu;
 		private GameObject lastMenu;
 		private bool gameStarted;
+
+		public AudioManager AudioManager;
 
 		public void Start() {
 			GameState.Pause ();
 			ShowMenu (MainMenu);
 			gameStarted = false;
 
-			Music.Play(GetComponents<AudioSource>()[0]);
-			AmbientSound.SetSource(GetComponents<AudioSource> () [1]);
-			ActionSound.SetSource (GetComponents<AudioSource> () [2]);
+			AudioManager = AudioManager.GetInstance ();
+			AudioManager.PlayMusic (AudioManager.Music.Menu);
 		}
 
 		public void Update() {
@@ -81,6 +79,8 @@ namespace Se {
 			foreach (GameObject menu in Menus) {
 				menu.SetActive (false);
 			}
+			AudioManager.PauseMusic ();
+			AudioManager.PlayAmbient ();
 		}
 
 		// NOTE: Pause the game and shows Pause Menu
@@ -89,6 +89,9 @@ namespace Se {
 			EventSystem.current.SetSelectedGameObject(PauseMenu.transform.GetChild(0).gameObject);
 			Se.GameState.Pause ();
 			ShowMenu (PauseMenu);
+		
+			AudioManager.PlayMusic (AudioManager.Music.Menu);
+			AudioManager.PauseAmbient ();
 		}
 	}
 
