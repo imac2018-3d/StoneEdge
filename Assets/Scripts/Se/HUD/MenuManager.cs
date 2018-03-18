@@ -70,6 +70,7 @@ namespace Se {
 		}
 			
 		public void ExitGame() {
+			LoadingScreenManager.GetInstance ().Show (2);
 			Application.Quit ();
 		}
 
@@ -80,6 +81,7 @@ namespace Se {
 			foreach (GameObject menu in Menus) {
 				menu.SetActive (false);
 			}
+			LoadingScreenManager.GetInstance ().Show (0.5f);
 			audioManager.PauseMusic ();
 			audioManager.PlayAmbient ();
 		}
@@ -91,6 +93,7 @@ namespace Se {
 			Se.GameState.Pause ();
 			ShowMenu (PauseMenu);
 		
+			LoadingScreenManager.GetInstance ().Show (0.5f);
 			audioManager.PlayMusic (AudioManager.Music.Menu);
 			audioManager.PauseAmbient ();
 		}

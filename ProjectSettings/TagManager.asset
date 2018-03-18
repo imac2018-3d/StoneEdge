@@ -8,6 +8,7 @@ TagManager:
   - AudioManager
   - MenuManager
   - PlayerExplanationsManager
+  - LoadingScreenManager
   layers:
   - Default
   - TransparentFX
