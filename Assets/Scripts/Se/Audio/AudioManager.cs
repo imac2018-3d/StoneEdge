@@ -36,6 +36,13 @@ namespace Se {
 		}
 		public List<AmbientSample>  AmbientSamples;
 
+		private static GameObject instance;
+		public static AudioManager GetInstance() {
+			if (!instance)
+				instance = GameObject.FindGameObjectWithTag ("AudioManager");
+			return instance.GetComponent<AudioManager>();
+		}
+
 		public void Start() {
 			MusicSound.SetSource(GetComponents<AudioSource>()[0]);
 			AmbientSound.SetSource(GetComponents<AudioSource> () [1]);
@@ -61,6 +68,10 @@ namespace Se {
 			ActionSound.Play ();
 		}
 
+		public void PauseAction() {
+			ActionSound.Pause ();
+		}
+
 		public void PlayAmbient(Ambient sound) {
 			AudioClip newSample = AmbientSamples.Find (x => x.ambient.Equals (sound)).sample;
 			if(!AmbientSound.sample.Equals(newSample)) AmbientSound.SetSample (newSample);
@@ -73,10 +84,6 @@ namespace Se {
 
 		public void PauseAmbient() {
 			AmbientSound.Pause ();
-		}
-
-		public static AudioManager GetInstance() {
-			return GameObject.FindGameObjectWithTag ("AudioManager").GetComponent<AudioManager>();
 		}
 	}
 }
