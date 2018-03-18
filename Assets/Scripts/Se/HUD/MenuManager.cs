@@ -15,15 +15,16 @@ namespace Se {
 		private GameObject lastMenu;
 		private bool gameStarted;
 
-		public AudioManager AudioManager;
+		private AudioManager audioManager;
+		private static GameObject instance;
 
 		public void Start() {
 			GameState.Pause ();
 			ShowMenu (MainMenu);
 			gameStarted = false;
 
-			AudioManager = AudioManager.GetInstance ();
-			AudioManager.PlayMusic (AudioManager.Music.Menu);
+			audioManager = AudioManager.GetInstance ();
+			audioManager.PlayMusic (AudioManager.Music.Menu);
 		}
 
 		public void Update() {
@@ -79,8 +80,8 @@ namespace Se {
 			foreach (GameObject menu in Menus) {
 				menu.SetActive (false);
 			}
-			AudioManager.PauseMusic ();
-			AudioManager.PlayAmbient ();
+			audioManager.PauseMusic ();
+			audioManager.PlayAmbient ();
 		}
 
 		// NOTE: Pause the game and shows Pause Menu
@@ -90,8 +91,14 @@ namespace Se {
 			Se.GameState.Pause ();
 			ShowMenu (PauseMenu);
 		
-			AudioManager.PlayMusic (AudioManager.Music.Menu);
-			AudioManager.PauseAmbient ();
+			audioManager.PlayMusic (AudioManager.Music.Menu);
+			audioManager.PauseAmbient ();
+		}
+
+		public static MenuManager GetInstance() {
+			if (!instance)
+				instance = GameObject.FindGameObjectWithTag ("MenuManager");
+			return instance.GetComponent<MenuManager>();
 		}
 	}
 

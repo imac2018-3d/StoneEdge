@@ -27,7 +27,7 @@ namespace Se {
 		public InputField JumpQuakeXbox;
 
 		private List<KeyCode> reservedKeyboardInputs = new List<KeyCode> { KeyCode.Backspace, KeyCode.Return, KeyCode.Escape };
-		private List<XbButton> reservedXboxControllerInputs = new List<XbButton> { XbButton.Start };
+		private List<XbButton> reservedXboxControllerInputs = new List<XbButton> { XbButton.Start, XbButton.Back };
 	
 		private KeyCode newJump;
 		private KeyCode newDodge;
@@ -55,7 +55,7 @@ namespace Se {
 
 			Windowed.isOn = !Screen.fullScreen;
 
-			CurrentUserSettings.LoadSettings (GetComponentInParent<MenuManager>());
+			CurrentUserSettings.LoadSettings ();
 
 			AmbientAudioVolume.value = CurrentUserSettings.Data.AmbientVolume;
 			AmbientAudioVolume.minValue = 0.0f;
@@ -97,25 +97,28 @@ namespace Se {
 			newJumpXbox = (XbButton)System.Enum.Parse (typeof(XbButton), JumpXbox.text);
 			reservedXboxControllerInputs.Add (newJumpXbox);
 
-			DodgeXbox.text = CurrentUserSettings.Data.KeyboardDodge;
+			DodgeXbox.text = CurrentUserSettings.Data.XbButtonDodge;
 			newDodgeXbox = (XbButton)System.Enum.Parse (typeof(XbButton), DodgeXbox.text);
 			reservedXboxControllerInputs.Add (newDodgeXbox);
 
-			BasicAttackXbox.text = CurrentUserSettings.Data.KeyboardBasicAttack;
+			BasicAttackXbox.text = CurrentUserSettings.Data.XbButtonBasicAttack;
 			newBasicAttackXbox = (XbButton)System.Enum.Parse (typeof(XbButton), BasicAttackXbox.text);
 			reservedXboxControllerInputs.Add (newBasicAttackXbox);
 
-			MagnetImpactXbox.text = CurrentUserSettings.Data.KeyboardMagnetImpact;
+			MagnetImpactXbox.text = CurrentUserSettings.Data.XbButtonMagnetImpact;
 			newMagnetImpactXbox = (XbButton)System.Enum.Parse (typeof(XbButton), MagnetImpactXbox.text);
 			reservedXboxControllerInputs.Add (newMagnetImpactXbox);
 
-			JumpQuakeXbox.text = CurrentUserSettings.Data.KeyboardJumpQuake;
+			JumpQuakeXbox.text = CurrentUserSettings.Data.XbButtonJumpQuake;
 			newJumpQuakeXbox = (XbButton)System.Enum.Parse (typeof(XbButton), JumpQuakeXbox.text);
 			reservedXboxControllerInputs.Add (newJumpQuakeXbox);
 		}
 		
 		// Update is called once per frame
 		void Update () {
+			if (InputActions.MenuConfirms) {
+				CurrentUserSettings.Save ();
+			}
 			foreach (KeyCode kcode in Enum.GetValues(typeof(KeyCode))) {
 				if (Input.GetKeyDown (kcode)) {
 					if (!reservedKeyboardInputs.Contains (kcode)) {

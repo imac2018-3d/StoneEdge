@@ -24,9 +24,9 @@ namespace Se {
 		public String XbButtonJumpQuake;
 
 		public static readonly UserSettings Empty = new UserSettings {
-			AmbientVolume = 0.0f,
-			MusicVolume = 0.0f,
-			ActionVolume = 0.0f,
+			AmbientVolume = 0.5f,
+			MusicVolume = 0.5f,
+			ActionVolume = 0.5f,
 			KeyboardJump = "",
 			KeyboardDodge = "",
 			KeyboardBasicAttack = "",
@@ -74,8 +74,8 @@ namespace Se {
 			MenuManager.Back ();
 		}
 
-		public static void LoadSettings(MenuManager menuManager) {
-			MenuManager = menuManager;
+		public static void LoadSettings() {
+			MenuManager = MenuManager.GetInstance();
 			string json = File.ReadAllText (SavePath);
 			if (json == "")
 				Data = new UserSettings ();
@@ -137,7 +137,7 @@ namespace Se {
 				SetXbButtonJumpQuake (InputActions.Bindings.JumpQuake.XboxController.ToString());
 			else
 				SetXbButtonJumpQuake (Data.XbButtonJumpQuake);
-
+	
 			Save ();
 		}
 
