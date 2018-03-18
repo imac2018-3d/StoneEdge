@@ -15,7 +15,13 @@ namespace Se {
 			if (hero == null)
 				return;
 			Debug.Log ("Granting JumpQuake power to the Hero!" + (CurrentGameSaveData.Data.HasAcquiredJumpQuake ? " (was already acquired)" : ""));
+			StartCoroutine (ShowExplanations());
 			CurrentGameSaveData.Data.HasAcquiredJumpQuake = true;
+		}
+		IEnumerator ShowExplanations(){
+			PlayerExplanationsManager.GetInstance ().ShowJumpQuake ();
+			yield return new WaitForSeconds(10);
+			PlayerExplanationsManager.GetInstance ().HideJumpQuake ();
 		}
 	}
 }
