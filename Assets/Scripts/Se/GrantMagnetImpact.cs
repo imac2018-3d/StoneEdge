@@ -15,7 +15,14 @@ namespace Se {
 			if (hero == null)
 				return;
 			Debug.Log ("Granting MagnetImpact power to the Hero!" + (CurrentGameSaveData.Data.HasAcquiredMagnetImpact ? " (was already acquired)" : ""));
+			StartCoroutine (ShowExplanations());
 			CurrentGameSaveData.Data.HasAcquiredMagnetImpact = true;
 		}
+
+		IEnumerator ShowExplanations(){
+	        PlayerExplanationsManager.GetInstance ().ShowMagnetImpact ();
+	        yield return new WaitForSeconds(10);
+	        PlayerExplanationsManager.GetInstance ().HideMagnetImpact ();
+	    }
 	}
 }

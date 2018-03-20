@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13229edc6d6c8c949a575c591956ef4b, type: 3}
   m_Name: MusicAudioResource
   m_EditorClassIdentifier: 
-  sample: {fileID: 8300000, guid: fc8a840be591e944abdbd130ac91cd28, type: 3}
+  sample: {fileID: 8300000, guid: b1037518a3a096142bc2918241666bfb, type: 3}
   volume: 0.5
   source: {fileID: 0}

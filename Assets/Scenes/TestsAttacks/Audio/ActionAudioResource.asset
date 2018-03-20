@@ -11,6 +11,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13229edc6d6c8c949a575c591956ef4b, type: 3}
   m_Name: ActionAudioResource
   m_EditorClassIdentifier: 
-  sample: {fileID: 8300000, guid: 898f68ba8d84a7742bca299e57ae4a5f, type: 3}
+  sample: {fileID: 8300000, guid: 81ffd2ca479842b478103febca53d44b, type: 3}
   volume: 0.5
   source: {fileID: 0}

@@ -24,9 +24,9 @@ namespace Se {
 		public String XbButtonJumpQuake;
 
 		public static readonly UserSettings Empty = new UserSettings {
-			AmbientVolume = 0.0f,
-			MusicVolume = 0.0f,
-			ActionVolume = 0.0f,
+			AmbientVolume = 0.5f,
+			MusicVolume = 0.5f,
+			ActionVolume = 0.5f,
 			KeyboardJump = "",
 			KeyboardDodge = "",
 			KeyboardBasicAttack = "",
@@ -61,6 +61,7 @@ namespace Se {
 		public static UserSettings Data;
 		public static readonly string JsonFileName = "UserSettings.json";
 		public static MenuManager MenuManager;
+		public static AudioManager AudioManager;
 
 		public static string SavePath {
 			get { 
@@ -73,13 +74,15 @@ namespace Se {
 			MenuManager.Back ();
 		}
 
-		public static void LoadSettings(MenuManager menuManager) {
-			MenuManager = menuManager;
+		public static void LoadSettings() {
+			MenuManager = MenuManager.GetInstance();
 			string json = File.ReadAllText (SavePath);
 			if (json == "")
 				Data = new UserSettings ();
 			else
 				Data = JsonUtility.FromJson<UserSettings>(json);
+
+			AudioManager = AudioManager.GetInstance();
 
 			SetActionVolume(Data.ActionVolume);
 			SetAmbientVolume(Data.AmbientVolume);
@@ -134,23 +137,23 @@ namespace Se {
 				SetXbButtonJumpQuake (InputActions.Bindings.JumpQuake.XboxController.ToString());
 			else
 				SetXbButtonJumpQuake (Data.XbButtonJumpQuake);
-
+	
 			Save ();
 		}
 
 		public static void SetAmbientVolume(float newVolume) {
 			Data.AmbientVolume = newVolume;
-			MenuManager.AmbientSound.SetVolume (newVolume);
+			AudioManager.AmbientSound.SetVolume (newVolume);
 		}
 
 		public static void SetActionVolume(float newVolume) {
 			Data.ActionVolume = newVolume;
-			MenuManager.ActionSound.SetVolume(newVolume);
+			AudioManager.ActionSound.SetVolume(newVolume);
 		}
 
 		public static void SetMusicVolume(float newVolume) {
 			Data.MusicVolume = newVolume;
-			MenuManager.Music.SetVolume(newVolume);
+			AudioManager.MusicSound.SetVolume(newVolume);
 		}
 			
 		public static void SetKeyboardJump(String newValue) {

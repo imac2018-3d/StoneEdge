@@ -71,6 +71,7 @@ namespace Se {
 		bool canPunch { get { return lastPunchStartTime==0f ? true : Time.time - lastPunchStartTime > PunchCooldownDuration; } }
 
 		public void doPunch() {
+			AudioManager.GetInstance ().PlayAction (AudioManager.Action.BasicAttack);
 			lastPunchStartTime = Time.time;
 			var go = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 			go.transform.SetParent (transform, false);
@@ -88,16 +89,23 @@ namespace Se {
 				var ctrl = go.GetComponent <CharacterController> ();
 
 				if (ctrl.isGrounded) {
-					if (InputActions.Dodges)
+					if (InputActions.Dodges) {
+						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
 						return new Dodge ();
-					if (InputActions.IsPunching)
-						hero.KeepPunching();
+					}
+					if (InputActions.IsPunching) {
+						hero.KeepPunching ();
+					}
 					hero.moveDirection = hero.GetMovementInput () * hero.GroundMovementSpeedFactor;
-					if (InputActions.Jumps)
+					if (InputActions.Jumps) {
+						// AudioManager.GetInstance ().PlayAction (AudioManager.Action.Jump);
 						hero.moveDirection.y = hero.JumpStrength;
+					}
 				} else {
-					if (InputActions.IsAirKicking)
-						hero.KeepAirKicking();
+					if (InputActions.IsAirKicking) {
+						AudioManager.GetInstance ().PlayAction (AudioManager.Action.BasicAttack);
+						hero.KeepAirKicking ();
+					}
 					var v = hero.GetMovementInput () * hero.AirMovementSpeedFactor;
 					var candidate = hero.moveDirection + v;
 					candidate.y = 0f;

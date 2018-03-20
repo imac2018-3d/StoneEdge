@@ -10,22 +10,21 @@ namespace Se {
 		public GameObject[] Menus;
 		public GameObject MainMenu;
 		public GameObject PauseMenu;
-		public AudioResource AmbientSound;
-		public AudioResource Music;
-		public AudioResource ActionSound;
 
 		private GameObject currentMenu;
 		private GameObject lastMenu;
 		private bool gameStarted;
+
+		private AudioManager audioManager;
+		private static GameObject instance;
 
 		public void Start() {
 			GameState.Pause ();
 			ShowMenu (MainMenu);
 			gameStarted = false;
 
-			Music.Play(GetComponents<AudioSource>()[0]);
-			AmbientSound.SetSource(GetComponents<AudioSource> () [1]);
-			ActionSound.SetSource (GetComponents<AudioSource> () [2]);
+			audioManager = AudioManager.GetInstance ();
+			audioManager.PlayMusic (AudioManager.Music.Menu);
 		}
 
 		public void Update() {
@@ -71,6 +70,7 @@ namespace Se {
 		}
 			
 		public void ExitGame() {
+			LoadingScreenManager.GetInstance ().Show (2);
 			Application.Quit ();
 		}
 
@@ -81,6 +81,9 @@ namespace Se {
 			foreach (GameObject menu in Menus) {
 				menu.SetActive (false);
 			}
+			LoadingScreenManager.GetInstance ().Show (0.5f);
+			audioManager.PauseMusic ();
+			audioManager.PlayAmbient ();
 		}
 
 		// NOTE: Pause the game and shows Pause Menu
@@ -89,6 +92,16 @@ namespace Se {
 			EventSystem.current.SetSelectedGameObject(PauseMenu.transform.GetChild(0).gameObject);
 			Se.GameState.Pause ();
 			ShowMenu (PauseMenu);
+		
+			LoadingScreenManager.GetInstance ().Show (0.5f);
+			audioManager.PlayMusic (AudioManager.Music.Menu);
+			audioManager.PauseAmbient ();
+		}
+
+		public static MenuManager GetInstance() {
+			if (!instance)
+				instance = GameObject.FindGameObjectWithTag ("MenuManager");
+			return instance.GetComponent<MenuManager>();
 		}
 	}
 
