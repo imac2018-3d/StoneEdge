@@ -12,6 +12,8 @@
 // - Chunks are unloaded when reaching a sync Bridge and they're not
 //   referenced.
 
+#define DEADLINE_APPROACHING
+
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -53,6 +55,16 @@ namespace Se {
 
         static Dictionary<ChunkID, Info> loadInfos() {
             return new Dictionary<ChunkID, Info>() {
+				#if DEADLINE_APPROACHING
+				{ ChunkID.Test0, new Info("ChunkTest0", Obsolete.No) },
+				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.No) },
+				{ ChunkID.Test2, new Info("ChunkTest2", Obsolete.No) },
+				{ ChunkID.Test3, new Info("ChunkTest3", Obsolete.No) },
+				#else
+				{ ChunkID.Test0, new Info("ChunkTest0", Obsolete.Yes) },
+				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.Yes) },
+				{ ChunkID.Test2, new Info("ChunkTest2", Obsolete.Yes) },
+				{ ChunkID.Test3, new Info("ChunkTest3", Obsolete.Yes) },
 				{ ChunkID.TempleForest, new Info("TempleForest") },
 				{ ChunkID.Forest, new Info("Forest") },
 				{ ChunkID.Nexus, new Info("Nexus") },
@@ -65,11 +77,7 @@ namespace Se {
 				{ ChunkID.Village, new Info("Village") },
 				{ ChunkID.TempleVillage, new Info("TempleVillage") },
 				{ ChunkID.Mountain, new Info("Mountain") },
-
-				{ ChunkID.Test0, new Info("ChunkTest0", Obsolete.Yes) },
-				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.Yes) },
-				{ ChunkID.Test2, new Info("ChunkTest3", Obsolete.Yes) },
-				{ ChunkID.Test3, new Info("ChunkTest4", Obsolete.Yes) },
+				#endif
             };
         }
 
@@ -145,7 +153,9 @@ namespace Se {
                     Debug.LogError ("ChunkID " + c + " does NOT have a matching scene name!");
                 }
             }
+#if !DEADLINE_APPROACHING
 			Exit.If (!ok, "All ChunkIDs must have a matching scene name!");
+#endif
         }
             
         static Chunks cachedInstance = null;
@@ -233,6 +243,7 @@ namespace Se {
             }
             // If all required Sync Chunks are loaded, resume the game.
             if (syncWaitChunks.Count > 0 && syncWaitChunks.All (c => Infos [c].State == State.Loaded)) {
+				Debug.Log ("Trying to defreeze the world!");
 				GameState.DefreezeTheWorld();
                 syncWaitChunks.Clear();
             }

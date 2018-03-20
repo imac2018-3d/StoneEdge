@@ -39,11 +39,11 @@ namespace Se {
 
 			var distanceHack = MaxDistanceFromTarget;
 			var desired = Target.position - SelfToTarget.normalized * distanceHack;
-			var avg = averageAltitude (4);
+			var avg = float.NaN; // averageAltitude (4);
 			if (float.IsNaN (avg) || float.IsInfinity (avg)) {
 				Debug.LogWarning ("averageAltitude() returned " + avg + "!");
 			} else {
-				desired += Vector3.up * (AltitudeHack - (transform.position.y - avg));
+				desired += Vector3.up * ((Target.transform.position.y + AltitudeHack) - (transform.position.y - avg));
 			}
 			transform.position = Vector3.Lerp (transform.position, desired, 0.05f);
 			var input = InputActions.CameraMovementDirection;
