@@ -36,6 +36,15 @@ namespace Se {
 		}
 		void FixedUpdate() {
 			fsm.OnFixedUpdate (gameObject);
+			if (CurrentGameSaveData.DataChanged) {
+				foreach (var cp in Checkpoint.All) {
+					if (cp.Key == CurrentGameSaveData.Data.LastCheckpoint) {
+						ChangePosition (cp.Value.transform.position);
+						break;
+					}
+				}
+				CurrentGameSaveData.DataChanged = false;
+			}
 		}
 
 		public void ReceiveDamage(int amount) {
@@ -79,6 +88,11 @@ namespace Se {
 			go.transform.Rotate(Vector3.right, 90f, Space.Self);
 			go.AddComponent<ElectrickPunching> ();
 			Destroy (go, PunchColliderDuration);
+		}
+
+		public void ChangePosition(Vector3 newPosition) {
+			this.gameObject.transform.position = newPosition;
+			Debug.Log (this.gameObject.transform.position);
 		}
 	}
 

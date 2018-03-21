@@ -3301,11 +3301,6 @@ RectTransform:
   m_PrefabParentObject: {fileID: 224000010138437402, guid: 5d808685cb271b44f974dc643b3256bf,
     type: 2}
   m_PrefabInternal: {fileID: 978422384}
---- !u!1 &618824409 stripped
-GameObject:
-  m_PrefabParentObject: {fileID: 1000013025482648, guid: 5d808685cb271b44f974dc643b3256bf,
-    type: 2}
-  m_PrefabInternal: {fileID: 506719799}
 --- !u!224 &618824410 stripped
 RectTransform:
   m_PrefabParentObject: {fileID: 224000010138437402, guid: 5d808685cb271b44f974dc643b3256bf,
@@ -3803,7 +3798,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 1089534561}
+  m_Camera: {fileID: 0}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -4222,7 +4217,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 762028715}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -5831,7 +5826,7 @@ MonoBehaviour:
   m_Script: {fileID: -619905303, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_FirstSelected: {fileID: 618824409}
+  m_FirstSelected: {fileID: 0}
   m_sendNavigationEvents: 1
   m_DragThreshold: 5
 --- !u!4 &1047261401
