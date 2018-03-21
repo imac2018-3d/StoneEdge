@@ -37,12 +37,7 @@ namespace Se {
 		void FixedUpdate() {
 			fsm.OnFixedUpdate (gameObject);
 			if (CurrentGameSaveData.DataChanged) {
-				foreach (var cp in Checkpoint.All) {
-					if (cp.Key == CurrentGameSaveData.Data.LastCheckpoint) {
-						ChangePosition (cp.Value.transform.position);
-						break;
-					}
-				}
+				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
 				CurrentGameSaveData.DataChanged = false;
 			}
 		}
@@ -52,6 +47,9 @@ namespace Se {
 			if (life <= 0) {
 				life = 0;
 				// NOTE TODO: If we're here, the player died. Do something.
+				// If dies: returns to last checkpoint
+				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
+				life = MaxLife;
 			}
 		}
 
