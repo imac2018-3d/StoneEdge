@@ -2458,6 +2458,28 @@ MonoBehaviour:
   AngleAroundX: 0
   AngleAroundY: 0
   Distance: 5
+  MaxAngleAroundX: 80
+  MinAngleAroundX: -30
+  MinDistance: 1.4
+  MaxDistance: 10
+  DistanceFunction:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 2
+      time: 0.013044953
+      value: -0.0033305604
+      inSlope: 0.34268734
+      outSlope: 0.34268734
+      tangentMode: 0
+    - serializedVersion: 2
+      time: 1.0015717
+      value: 0.95542526
+      inSlope: 3.9827716
+      outSlope: 3.9827716
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
 --- !u!1 &1973781545 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100126, guid: 221b021785bb04b0ca118b99bc8c29ae, type: 3}
