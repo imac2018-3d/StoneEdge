@@ -39,7 +39,7 @@ public class PCristoSpawner : MonoBehaviour {
 
     void Start () {
         // Ça c'est pour du test
-        //InvokeRepeating("Fire", 0f, 1f);
+        InvokeRepeating("Fire", 0f, 1f);
     }
 
     /// <summary>

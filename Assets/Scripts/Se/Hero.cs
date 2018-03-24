@@ -36,6 +36,10 @@ namespace Se {
 		}
 		void FixedUpdate() {
 			fsm.OnFixedUpdate (gameObject);
+			if (CurrentGameSaveData.DataChanged) {
+				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
+				CurrentGameSaveData.DataChanged = false;
+			}
 		}
 
 		public void ReceiveDamage(int amount) {
@@ -43,6 +47,9 @@ namespace Se {
 			if (life <= 0) {
 				life = 0;
 				// NOTE TODO: If we're here, the player died. Do something.
+				// If dies: returns to last checkpoint
+				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
+				life = MaxLife;
 			}
 		}
 
@@ -79,6 +86,11 @@ namespace Se {
 			go.transform.Rotate(Vector3.right, 90f, Space.Self);
 			go.AddComponent<ElectrickPunching> ();
 			Destroy (go, PunchColliderDuration);
+		}
+
+		public void ChangePosition(Vector3 newPosition) {
+			this.gameObject.transform.position = newPosition;
+			Debug.Log (this.gameObject.transform.position);
 		}
 	}
 

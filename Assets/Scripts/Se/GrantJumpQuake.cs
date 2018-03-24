@@ -17,6 +17,7 @@ namespace Se {
 			Debug.Log ("Granting JumpQuake power to the Hero!" + (CurrentGameSaveData.Data.HasAcquiredJumpQuake ? " (was already acquired)" : ""));
 			StartCoroutine (ShowExplanations());
 			CurrentGameSaveData.Data.HasAcquiredJumpQuake = true;
+			CurrentGameSaveData.Save ();
 		}
 		IEnumerator ShowExplanations(){
 			PlayerExplanationsManager.GetInstance ().ShowJumpQuake ();

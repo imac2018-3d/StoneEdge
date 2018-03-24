@@ -21,6 +21,7 @@ namespace Se {
 				+" The previous one was \""+All[prevID].gameObject.name+"\" (ID: "+prevID+")."
 			);
 			CurrentGameSaveData.Data.LastCheckpoint = ID;
+			CurrentGameSaveData.Save ();
 		}
 	}
 }

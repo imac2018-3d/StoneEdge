@@ -31,6 +31,7 @@ namespace Se {
 	public static class CurrentGameSaveData {
 		public static GameSaveData Data;
 		public static readonly string JsonFileName = "GameSaveData.json";
+		public static bool DataChanged = false;
 
 		public static string SavePath {
 			get { 
@@ -41,6 +42,7 @@ namespace Se {
 		public static void NewGame() {
 			Data = new GameSaveData ();
 			Save ();
+			DataChanged = true;
 		}
 
 		public static void Save() {
@@ -50,6 +52,7 @@ namespace Se {
 		public static void LoadGame() {
 			string json = File.ReadAllText (SavePath);
 			Data = JsonUtility.FromJson<GameSaveData>(json);
+			DataChanged = true;
 		}
 	}
 }

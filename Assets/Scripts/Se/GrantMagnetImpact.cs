@@ -17,6 +17,7 @@ namespace Se {
 			Debug.Log ("Granting MagnetImpact power to the Hero!" + (CurrentGameSaveData.Data.HasAcquiredMagnetImpact ? " (was already acquired)" : ""));
 			StartCoroutine (ShowExplanations());
 			CurrentGameSaveData.Data.HasAcquiredMagnetImpact = true;
+			CurrentGameSaveData.Save ();
 		}
 
 		IEnumerator ShowExplanations(){
