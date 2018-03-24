@@ -791,8 +791,8 @@ MonoBehaviour:
   FogScale: 1
   DayAtmosphereThickness: 0.4
   NightAtmosphereThickness: 0.87
-  DayRotateSpeed: {x: 20, y: 0, z: 0}
-  NightRotateSpeed: {x: 20, y: 0, z: 0}
+  DayRotateSpeed: {x: 0.1, y: 0, z: 0}
+  NightRotateSpeed: {x: 0.1, y: 0, z: 0}
   Lightwall: {fileID: 0}
   Water: {fileID: 0}
   Stars: {fileID: 734164609}
@@ -1973,12 +1973,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Target: {fileID: 1390423130}
-  MinDistanceFromTarget: 1.2
-  MaxDistanceFromTarget: 2
-  YRotationSpeedFactor: 180
-  XRotationSpeedFactor: 180
-  AltitudeHack: 0.5
-  WantsToCaptureCursor: 0
+  RotationAroundYSpeed: 90
+  RotationAroundXSpeed: 90
+  AngleAroundX: 0
+  AngleAroundY: 0
+  Distance: 5
 --- !u!1 &1973781545 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100126, guid: 221b021785bb04b0ca118b99bc8c29ae, type: 3}

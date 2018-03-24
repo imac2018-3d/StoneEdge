@@ -3,10 +3,58 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-using Se;
-
 namespace Se {
+		public class FollowingCamera : MonoBehaviour {
+
+		// Plan:
+		// - Le saut ne doit pas bouger la CameraTarget
+		//   Faire un lookat progressif.
+		// - Il faut avoir un DesiredSelfToTarget.
+		//   C'est celui qu'on transforme. Le SelfToTarget ne fait que s'en rapprocher progressivement.
+
+		[Tooltip("GameObject to follow.")]
+		public Transform Target;
+		public float RotationAroundYSpeed;
+		public float RotationAroundXSpeed;
+
+		public float AngleAroundX;
+		public float AngleAroundY;
+		public float Distance;
+
+		void Awake () {
+			Assert.IsNotNull (Target);
+		}
+
+		void LateUpdate() { // NOTE: Not Update(), because otherwise there's stuttering.
+			var input = InputActions.CameraMovementDirection;
+			AngleAroundY += input.x * Time.deltaTime * RotationAroundYSpeed;
+			AngleAroundX += input.y * Time.deltaTime * RotationAroundXSpeed;
+
+			AngleAroundX = Mathf.Clamp (AngleAroundX, 0f, 80f);
+			AngleAroundY = Mathf.Repeat (AngleAroundY, 360f);
+
+			Distance = computeDistanceFromAngleAroundX ();
+
+			var ry = Quaternion.AngleAxis(AngleAroundY, Vector3.up);
+			var rx = Quaternion.AngleAxis(AngleAroundX, Vector3.right);
+			var selfToTarget = ry * rx * Vector3.forward * Distance;
+			transform.position = Target.position - selfToTarget;
+			transform.LookAt (Target.position);
+		}
+
+		float computeDistanceFromAngleAroundX() {
+			return 20f * Mathf.Clamp(AngleAroundX, 10f, 50f) / 70f;
+		}
+	}
+
+/*
 	public class FollowingCamera : MonoBehaviour {
+
+		// Plan:
+		// - Le saut ne doit pas bouger la CameraTarget
+		//   Faire un lookat progressif.
+		// - Il faut avoir un DesiredSelfToTarget.
+		//   C'est celui qu'on transforme. Le SelfToTarget ne fait que s'en rapprocher progressivement.
 
 		[Tooltip("GameObject to follow.")]
 		public Transform Target;
@@ -16,6 +64,9 @@ namespace Se {
 		public float XRotationSpeedFactor = 1f;
 		public float AltitudeHack = 3f;
 		public bool WantsToCaptureCursor;
+		public bool EnableAverageAltitudeTrick;
+
+		Vector3 desiredSelfToTarget;
 
 		void Awake () {
 			Assert.IsNotNull (Target);
@@ -37,15 +88,20 @@ namespace Se {
 			Cursor.lockState = WantsToCaptureCursor ? CursorLockMode.Locked : CursorLockMode.None;
 			Cursor.visible = !WantsToCaptureCursor;
 
-			var distanceHack = MaxDistanceFromTarget;
-			var desired = Target.position - SelfToTarget.normalized * distanceHack;
-			var avg = float.NaN; // averageAltitude (4);
-			if (float.IsNaN (avg) || float.IsInfinity (avg)) {
-				Debug.LogWarning ("averageAltitude() returned " + avg + "!");
-			} else {
-				desired += Vector3.up * ((Target.transform.position.y + AltitudeHack) - (transform.position.y - avg));
+			desiredSelfToTarget = new Vector3 (0, 0, -MaxDistanceFromTarget);
+			var desiredPosition = Target.position - desiredSelfToTarget.normalized * MaxDistanceFromTarget;
+
+			if (EnableAverageAltitudeTrick) {
+				var avg = float.NaN; // averageAltitude (4);
+				if (float.IsNaN (avg) || float.IsInfinity (avg)) {
+					Debug.LogWarning ("averageAltitude() returned " + avg + "!");
+				} else {
+					desiredPosition += Vector3.up * ((Target.transform.position.y + AltitudeHack) - (transform.position.y - avg));
+				}
+			
 			}
-			transform.position = Vector3.Lerp (transform.position, desired, 0.05f);
+			transform.position = Vector3.Lerp (transform.position, desiredPosition, 0.1f);
+
 			var input = InputActions.CameraMovementDirection;
 			SelfToTarget = Quaternion.AngleAxis (input.x * Time.deltaTime * YRotationSpeedFactor, Vector3.up) * SelfToTarget;
 			SelfToTarget = Quaternion.AngleAxis (input.y * Time.deltaTime * XRotationSpeedFactor, transform.right) * SelfToTarget;
@@ -67,4 +123,5 @@ namespace Se {
 			return altitudesSum / (float) total;
 		}
 	}
+*/
 } // namespace Se
