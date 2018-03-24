@@ -5,7 +5,8 @@ using UnityEngine;
 public class SplineCreator : MonoBehaviour {
 
 	public float ColliderRadius = 0.7f;
-	public int gap = 0;
+	public uint PointsPerFace = 4;
+	public uint Gap = 0;
 
 	void Awake()
 	{
@@ -27,10 +28,11 @@ public class SplineCreator : MonoBehaviour {
 		Mesh mesh = GetComponent<MeshFilter>().sharedMesh;
 		Vector3[] vertices = mesh.vertices;
 		Vector3[] normals = mesh.normals;
-		int i = 0;
+		uint i = 0;
 		SplineNode currentNode = null;
+		float proportion = 1.0f / PointsPerFace;
 
-		while (i < vertices.Length - 4)
+		while (i < vertices.Length - PointsPerFace)
 		{
 			if (currentSpline.Length == 0)
 			{
@@ -54,17 +56,21 @@ public class SplineCreator : MonoBehaviour {
 			{
 				currentNode = currentNode.AddNext().GetComponent<SplineNode>();
 			}
-			currentNode.up = normals[i];
 			Vector3 v = new Vector3();
-			for(int j = 0; j < 4; ++j)
+			Vector3 n = new Vector3();
+			for (int j = 0; j < PointsPerFace; ++j)
 			{
-					v += vertices[i];
-					++i;
+				v += vertices[i];
+				n += normals[i];
+				++i;
 			}
-			v.x *= 0.25f; v.y *= 0.25f; v.z *= 0.25f;
+			v.x *= proportion; v.y *= proportion; v.z *= proportion;
+			n.x *= proportion; n.y *= proportion; n.z *= proportion;
 			v.Scale(transform.localScale);
 			currentNode.transform.position = v;
-			i += gap*4;
+			currentNode.up = n;
+
+			i += Gap * PointsPerFace;
 
 			if (currentSpline.Length >= Spline.MAX_SPLINE_LENGTH)
 			{

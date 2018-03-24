@@ -23,83 +23,148 @@ public class SplineController : MonoBehaviour {
 	public float Speed = 2.0f;
 	public int PredictionCount = 2;
 	public float PredictionCoef = 1.0f;
+	public float PlayerBarycenter = 0.51f;
 
 	private float currentSpeed;
-	private float currentAcceleration;
+	private float lastInput = 0;
 
 	public Spline CurrentSpline;
-	public SplineNode GroundNode;
+	public SplineNode CurrentNode;
 
-	private float rotationT = 0;
+	private float rotationTime = 0;
 	private float currentRotationSpeed = 0.1f;
 
-	private Vector3 targetRotationUp;
-	private Vector3 targetRotationForward;
+	private Vector3 targetUp;
+	private Vector3 targetForward;
+
+	private bool turnBack = false;
 
 	public static int SplineTopLayer = 31;
 
-	void OnGUI() {
-		GUI.Box(new Rect(Screen.width - 75, 25, 75, 20), GetComponent<Rigidbody>().velocity.ToString());
-	}
 	public virtual void Start() {
 		if(CurrentSpline) {
-			CurrentSpline.followers.Add(this);
+			CurrentSpline.follower = this;
+		}
+	}
+
+	void updateTarget(float input)
+	{
+		Rigidbody body = GetComponent<Rigidbody>();
+		SplineNode next;
+		Vector3 velocity, position;
+		if (FindNextSplineNode(out next, out velocity, out position))
+		{
+			rotationTime = 0.2f;
+			currentRotationSpeed = InitialRotationSpeed*2;
+			transform.position = position;
+			body.velocity = body.velocity.magnitude * Mathf.Sign(Vector3.Dot(body.velocity, next.forward)) * next.forward;
+		}
+		CurrentNode = next;
+		if (CurrentNode && !turnBack)
+		{
+			if (body.velocity.sqrMagnitude < 0.1)
+			{
+				currentSpeed = 0;
+				targetForward = (CurrentNode.forward * Mathf.Sign(Vector3.Dot(transform.forward, CurrentNode.forward)));
+			}
+			else
+			{
+				currentSpeed = Vector3.Dot(body.velocity, CurrentNode.forward);
+				targetForward = (CurrentNode.forward * Mathf.Sign(currentSpeed));
+			}
+			targetUp = CurrentNode.up;
+
+			if (input > 0)
+			{
+				if (currentSpeed == 0)
+				{
+					rotationTime = 0;
+					currentRotationSpeed = InitialRotationSpeed;
+				}
+			}
+			else if (input == 0)
+			{
+				rotationTime = 0;
+				currentRotationSpeed = InitialRotationSpeed;
+			}
+		}
+		lastInput = input;
+	}
+
+	void updateVelocity(float input)
+	{
+		if (CurrentNode != null && input > 0)
+		{
+			Rigidbody body = GetComponent<Rigidbody>();
+			float projectionMagnitude = Vector3.Dot(body.velocity, targetForward);
+			if (projectionMagnitude*projectionMagnitude < 0.5 * body.velocity.sqrMagnitude) // straight rotation
+			{
+				rotationTime = 0.2f;
+				currentRotationSpeed = InitialRotationSpeed * 2;
+				Vector3 currentVelocity = body.velocity;
+				body.velocity = Vector3.zero;
+				body.AddForce(currentVelocity.magnitude * targetForward, ForceMode.Impulse);
+			}
+			else
+			{
+				Vector3 acc = targetForward * CurrentNode.acceleration * Speed;
+				body.AddForce(acc * Time.fixedDeltaTime, ForceMode.Impulse);
+				if (body.velocity.sqrMagnitude > CurrentNode.speed * CurrentNode.speed)
+				{
+					body.velocity = body.velocity.normalized*CurrentNode.speed;
+				}
+			}
+		}
+	}
+
+	void updateRotation(float input)
+	{
+		if (CurrentNode)
+		{
+			if (turnBack)
+			{
+				turnBack = Vector3.Dot(transform.forward, targetForward) < 0.99;
+			}
+			else if (input < 0)
+			{
+				turnBack = true;
+				rotationTime = 0;
+				currentRotationSpeed = InitialRotationSpeed * 2;
+				targetForward = -1 * (CurrentNode.forward * Mathf.Sign(Vector3.Dot(transform.forward, CurrentNode.forward)));
+			}
+			rotationTime = Mathf.SmoothDamp(rotationTime, 1, ref currentRotationSpeed,
+												RotationDamping, RotationSpeedMax, Time.fixedDeltaTime);
+			transform.rotation = Quaternion.Lerp(transform.rotation,
+																					Quaternion.LookRotation(targetForward, targetUp),
+																					rotationTime);
 		}
 	}
 
 	void Drive(float input = 0) {
-		Rigidbody body = GetComponent<Rigidbody>();
-		if (GroundNode)
+		if (CurrentNode)
 		{
-			input = 1;
-			body.angularVelocity = Vector3.zero;
-			currentSpeed = Vector3.Dot(body.velocity, GroundNode.forward);
-			if (input != 0)
+			updateTarget(input);
+			if (input > 0)
 			{
-				if ((currentSpeed==0 ^ input==0) || Mathf.Sign(input) != Mathf.Sign(currentSpeed))
-				{
-					rotationT = 0;
-					currentRotationSpeed = InitialRotationSpeed;
-				}
-				targetRotationForward = Mathf.Sign(input) * GroundNode.forward;
-				targetRotationUp = GroundNode.up;
+				updateVelocity(input);
 			}
-			else
-			{
-				if (Mathf.Abs(currentSpeed) >= 0.5)
-				{
-					rotationT = 0;
-					currentRotationSpeed = InitialRotationSpeed;
-				}
-				targetRotationForward = transform.forward;
-				targetRotationUp = GroundNode.up;
-			}
-			if (Mathf.Abs(currentSpeed+GroundNode.acceleration*input*Speed) < GroundNode.speed)
-				currentAcceleration = input*GroundNode.acceleration * Speed;
-			else
-				currentAcceleration = (GroundNode.speed-currentSpeed) / Time.deltaTime;
-			body.AddForce(currentAcceleration * Time.deltaTime * GroundNode.forward, ForceMode.Impulse);
-			rotationT = Mathf.SmoothDamp(rotationT, 1, ref currentRotationSpeed, RotationDamping, RotationSpeedMax, Time.deltaTime);
-			transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(targetRotationForward, targetRotationUp),rotationT);
-			FindNextSplineNode();
+			updateRotation(input);
 		}
 		else
 		{
-			bool landed;
-			int traveltime;
-			Vector3 position, currentPosition = transform.position - transform.up * GetComponent<CapsuleCollider>().height * 0.52f;
-			if (FindNextSpline(currentPosition, GetComponent<Rigidbody>().velocity*Time.deltaTime*PredictionCoef,
-													out position, out landed, out traveltime))
+			Spline nextSpline;
+			SplineNode nextNode;
+			Vector3 position, currentPosition = transform.position - 
+				transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+			if (FindNextSpline(currentPosition, GetComponent<Rigidbody>().velocity*Time.fixedDeltaTime*PredictionCoef, 
+												out position, out nextSpline, out nextNode))
 			{
-				if (landed)
-				{
-					Land(position);
-				}
+					Land(position, nextSpline, nextNode);
 			}
 		}
 	}
 
-	public virtual void Update() {
+	public virtual void FixedUpdate() {
 		CharacterControl character = GetComponent<CharacterControl>();
 
 		if (character)
@@ -109,21 +174,18 @@ public class SplineController : MonoBehaviour {
 	}
 
 	void OnDrawGizmos() {
-		//Ground = red
-		//Grav = green
-		//Other = blue
 		Gizmos.color = Color.cyan;
-		if(GroundNode) {
-			Gizmos.DrawCube(GroundNode.transform.position, Vector3.one * 0.1f);
-			Gizmos.DrawLine(GroundNode.transform.position, GroundNode.transform.position + GroundNode.forward);
+		if(CurrentNode) {
+			Gizmos.DrawCube(CurrentNode.transform.position, Vector3.one * 0.1f);
+			Gizmos.DrawLine(CurrentNode.transform.position, CurrentNode.transform.position + CurrentNode.forward);
 			Gizmos.DrawLine(transform.position, transform.position + transform.forward);
 			Gizmos.color = Color.magenta;
-			Gizmos.DrawLine(GroundNode.transform.position, GroundNode.transform.position + GroundNode.up);
+			Gizmos.DrawLine(CurrentNode.transform.position, CurrentNode.transform.position + CurrentNode.up);
 			Gizmos.DrawLine(transform.position, transform.position + transform.up);
 		}
 		if(CurrentSpline)
 		{
-			for (int i=0; i<CurrentSpline.length;++i)
+			for (uint i=0; i<CurrentSpline.length;++i)
 			{
 				Gizmos.color = Color.blue;
 				Gizmos.DrawLine(CurrentSpline[i].transform.position, CurrentSpline[i].transform.position + CurrentSpline[i].forward);
@@ -132,20 +194,6 @@ public class SplineController : MonoBehaviour {
 			}
 		}
 	}
-	//	public void UpdateSpline(){
-	//		if(CurrentSpline != CurrentSplineSource.spline){
-	//			Svertex oldBegin = CurrentSpline.begin;
-	//			Svertex newBegin = CurrentSplineSource.spline.begin;
-	//			while(oldBegin.next != null && newBegin.next != null){		//roll forward through both splines until we find the old groundCV
-	//				if(oldBegin == groundCV)
-	//					break;
-	//				oldBegin = oldBegin.next;
-	//				newBegin = newBegin.next;
-	//			}
-	//			groundCV = newBegin;
-	//			CurrentSpline = CurrentSplineSource.spline;
-	//		}
-	//	}
 
 	public void Detach() {
 		Rigidbody body = GetComponent<Rigidbody>();
@@ -154,13 +202,12 @@ public class SplineController : MonoBehaviour {
 			if (CurrentSpline.next.begin)
 			{
 				CurrentSpline = CurrentSpline.next;
-				GroundNode = CurrentSpline.begin;
+				CurrentNode = CurrentSpline.begin;
 				SplineNode next;
-				Vector3 velocity, position;
-				if (FindNextSplineNode(GroundNode, out next, out velocity, out position))
+				Vector3 position, velocity;
+				if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
 				{
-					body.velocity = velocity;
-					transform.position = position;
+					PartialLand(position, velocity, next);
 					return;
 				}
 			}
@@ -170,50 +217,49 @@ public class SplineController : MonoBehaviour {
 			if (CurrentSpline.previous.end)
 			{
 				CurrentSpline = CurrentSpline.previous;
-				GroundNode = CurrentSpline.end;
+				CurrentNode = CurrentSpline.end;
 				SplineNode next;
-				Vector3 velocity, position;
-				if (FindNextSplineNode(GroundNode, out next, out velocity, out position))
+				Vector3 position, velocity;
+				if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
 				{
-					body.velocity = velocity;
-					transform.position = position;
+					PartialLand(position, velocity, next);
 					return;
 				}
 			}
 		}
 		Debug.Log("detach" + Time.frameCount);
-		GetComponent<Rigidbody>().useGravity = true;
+		body.useGravity = true;
+		body.velocity = Vector3.zero;
+		body.AddForce(CurrentNode.speed * (targetForward+targetUp) * 0.5f, ForceMode.Impulse);
+		CurrentSpline.Oust();
 		CurrentSpline = null;
-		GroundNode = null;
+		CurrentNode = null;
 	}
 
-	bool FindNextSplineNode()
+	bool FindNextSplineNode(out SplineNode next, out Vector3 velocity, out Vector3 position)
 	{
-		if (GroundNode)
+		if (CurrentNode)
 		{
-			SplineNode next;
 			Rigidbody body = GetComponent<Rigidbody>();
-			Vector3 velocity, position;
-			if (FindNextSplineNode(GroundNode, out next, out velocity, out position))
+			if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
 			{
-				if (GroundNode != next)
+				if (CurrentNode != next)
 				{
-					transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(targetRotationForward, targetRotationUp), 0.2f);
-					rotationT = 0; currentRotationSpeed = InitialRotationSpeed;
-					GroundNode = next;
+					return true;
 				}
-				body.velocity = velocity;
-				transform.position = position;
-				return true;
+				return false;
 			}
 			Detach();
 		}
+		next = null;
+		velocity = Vector3.zero;
+		position = Vector3.zero;
 		return false;
 	}
 
 	bool FindNextSplineNode(SplineNode current, out SplineNode next, out Vector3 velocity, out Vector3 position)
 	{
-		Vector3 currentPosition = transform.position - transform.up * GetComponent<CapsuleCollider>().height * 0.52f;
+		Vector3 currentPosition = transform.position - transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
 		Vector3 newPosition = currentPosition;
 		next = current;
 		float currentSnapDist = SnapDistance;
@@ -222,14 +268,15 @@ public class SplineController : MonoBehaviour {
 		int i;
 		for (i = 0; i < PredictionCount; ++i)
 		{
-			if (FindSplineVertex(CurrentSpline, currentPosition, currentPosition + body.velocity * Time.deltaTime * predictionCoef,
+			if (FindSplineVertex(CurrentSpline, currentPosition, 
+												currentPosition + body.velocity * Time.fixedDeltaTime * predictionCoef,
 												current, out next, out newPosition, 3))
 				break;
 			predictionCoef *= 0.8f;
 			SnapDistance *= 1.3f;
 		}
 		SnapDistance = currentSnapDist;
-		position = newPosition + GroundNode.up * GetComponent<CapsuleCollider>().height * 0.52f;
+		position = newPosition + transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
 		if (i < PredictionCount)
 		{
 			velocity = body.velocity * predictionCoef;
@@ -243,7 +290,7 @@ public class SplineController : MonoBehaviour {
 		return FindSplineVertex(s, a, b, null, out vert, out position);
 	}
 
-	bool checkSpineNode(SplineNode node, Vector3 a, Vector3 b, float sqrSnapDistance,
+	bool checkSplineNode(SplineNode node, Vector3 a, Vector3 b, float sqrSnapDistance,
 											out Vector3 position)
 	{
 		if (node != null && node.next != null)
@@ -253,8 +300,6 @@ public class SplineController : MonoBehaviour {
 			if (dot >= 0)
 			{
 				Vector3 projection = node.transform.position + dot * node.forward;
-				//Utility.Vector3Pair points =
-				//Utility.Dist3DSegToSeg(a, b, node.transform.position, node.next.transform.position);
 				Debug.DrawLine(projection, b, Color.green);
 
 				if ((b - projection).sqrMagnitude < sqrSnapDistance
@@ -291,7 +336,7 @@ public class SplineController : MonoBehaviour {
 			{
 				if (countup)
 				{
-					if (checkSpineNode(countup, a, b, squareSnap, out position))
+					if (checkSplineNode(countup, a, b, squareSnap, out position))
 					{
 						vert = countup;
 						return true;
@@ -300,7 +345,7 @@ public class SplineController : MonoBehaviour {
 				}
 				if (countdown)
 				{
-					if (checkSpineNode(countdown.previous, a, b, squareSnap, out position))
+					if (checkSplineNode(countdown.previous, a, b, squareSnap, out position))
 					{
 						vert = countdown.previous;
 						return true;
@@ -316,94 +361,54 @@ public class SplineController : MonoBehaviour {
 	}
 
 	bool FindNextSpline(Vector3 position, Vector3 velocity, 
-											out Vector3 landing, out bool landed, out int traveltime) {
-		traveltime = 0;
+											out Vector3 landingPos, out Spline nextSpline, out SplineNode nextNode) {
 		RaycastHit hit;
-		bool found = false;
 		Debug.DrawLine(position, position+velocity, Color.magenta);
+		
 		LayerMask mask = LayerMask.GetMask(LayerMask.LayerToName(SplineTopLayer));
 		if (Physics.Linecast(position, position+velocity, out hit, mask.value))
 		{
-			found = true;
-		}
-		if(found && (hit.point - position).sqrMagnitude < SnapDistance*SnapDistance) {   //This means that the first cast hit the collider
-			if(hit.transform.parent)
-				CurrentSpline = hit.transform.parent.GetComponent<Spline>();
-			else
-				CurrentSpline = hit.transform.GetComponent<Spline>();
-			if(!CurrentSpline)
-				CurrentSpline = hit.transform.GetComponentInChildren<Spline>();
-			if(CurrentSpline) {
-				CurrentSpline.followers.Add(this);
-				//transform.position = hit.point;
-				transform.parent = CurrentSpline.transform;
-				if(FindSplineVertex(CurrentSpline, position, position + velocity, out GroundNode, out landing))
+			if ((hit.point - position).sqrMagnitude < SnapDistance * SnapDistance)
+			{
+				if (hit.transform.parent)
 				{
-					landed = true;
-				} else {
-					landed = false;
+					nextSpline = hit.transform.parent.GetComponent<Spline>();
+					SplineCollider collider = hit.transform.GetComponent<SplineCollider>();
+					nextNode = null;
+					if (collider)
+						nextNode = collider.node;
+
+					if (FindSplineVertex(nextSpline, position, position + velocity, nextNode, out nextNode, out landingPos))
+						return true;
+
 					Debug.LogWarning("Error in findNextSpline - Couldn't Land");
 				}
-				return true;
 			}
 		}
-		landing = Vector3.zero;
-		landed = false;
+		nextNode = null;
+		nextSpline = null;
+		landingPos = Vector3.zero;
 		return false;
 	}
 
-	public bool FindNextSplineMouse(out Vector3 position, Vector3 point) {
-		RaycastHit hit;
-		if(Physics.Raycast(point, Vector3.down, out hit, SnapDistance, 1 << SplineTopLayer)) {
-			if(hit.transform.parent.GetComponent<Spline>()) {
-				CurrentSpline = hit.transform.parent.GetComponent<Spline>();
-				if(FindSplineVertex(CurrentSpline, point, point + Vector3.down * SnapDistance,
-														out GroundNode, out position)) {
-					return true;
-				}
-			}
-		}
-		position = Vector3.zero;
-		return false;
-	}
-	//-------------------//
-	//	SPLINE PHYSICS!!!//
-	//-------------------//
-	bool NextNode() {
-		if(GroundNode.next) {
-			GroundNode = GroundNode.next;
-			return true;
-		}
-		else if(CurrentSpline.next) {
-			if(CurrentSpline.next.begin) {
-				CurrentSpline = CurrentSpline.next;
-				GroundNode = CurrentSpline.begin;
-				return true;
-			} else Debug.LogWarning("Next spline missing begin");
-		}
-		return false;
-	}
-	bool PreviousNode() {
-		if(GroundNode.previous) {
-			GroundNode = GroundNode.previous;
-			return true;
-		}
-		else {
-			if(CurrentSpline.previous) {
-				if(CurrentSpline.previous.end) {
-					CurrentSpline = CurrentSpline.previous;
-					GroundNode = CurrentSpline.end;
-					return true;
-				} else Debug.LogWarning("Previous spline missing end");
-			}
-		}
-		return false;
-	}
-	public virtual void Land(Vector3 position) {
+	public void Land(Vector3 position, Spline landingSpline, SplineNode landingNode) {
+		Debug.Log("attach" + Time.frameCount);
 		Rigidbody body = GetComponent<Rigidbody>();
 		body.useGravity = false;
 		body.velocity = Vector3.zero;
-		rotationT = 0; currentRotationSpeed = InitialRotationSpeed;
-		transform.position = position + GroundNode.up * GetComponent<CapsuleCollider>().height * 0.52f;
+		rotationTime = 0; currentRotationSpeed = InitialRotationSpeed;
+		transform.position = position + transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+		CurrentSpline = landingSpline;
+		CurrentNode = landingNode;
+	}
+
+	public void PartialLand(Vector3 position, Vector3 velocity, SplineNode landingNode)
+	{
+		Debug.Log("reattach" + Time.frameCount);
+		Rigidbody body = GetComponent<Rigidbody>();
+		body.useGravity = false;
+		body.velocity = velocity;
+		transform.position = position;
+		CurrentNode = landingNode;
 	}
 }

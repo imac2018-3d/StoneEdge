@@ -20,7 +20,6 @@ public class Spline : MonoBehaviour {
 	public static int MAX_SPLINE_LENGTH = 200;
 	public bool playerWalkable = true;
 
-	public Set followers = new Set();
 	public static int bumpHeight = 4;
 
 	public SplineNode begin, end;
@@ -44,13 +43,11 @@ public class Spline : MonoBehaviour {
 	public float setSpeed;
 
 	[HideInInspector]
-	public bool handlesOn = true;
-	[HideInInspector]
 	public bool nodesOn = true;
 	[HideInInspector]
 	public bool collidersOn = true;
-	[HideInInspector]
-	public bool locked = true;
+
+	public SplineController follower;
 
 
 	void OnDrawGizmos()
@@ -82,11 +79,19 @@ public class Spline : MonoBehaviour {
 	}
 
 	public void Oust() {
-		foreach(SplineController follower in followers) {
+		if (follower != null)
+		{
 			follower.Detach();
+			follower = null;
 		}
 	}
-	public SplineNode this[int index] {
+
+	public void Get(SplineController follower)
+	{
+		this.follower = follower;
+	}
+
+	public SplineNode this[uint index] {
 		get {
 			SplineNode temp;
 			if(begin) temp = begin;
@@ -97,7 +102,9 @@ public class Spline : MonoBehaviour {
 			return temp;
 		}
 	}
+
 	public void AddVert(SplineNode vert) {
+		vert.index = Length;
 		Length++;
 		if(!vert.next)
 			end = vert;
@@ -106,6 +113,7 @@ public class Spline : MonoBehaviour {
 		vert.spline = this;
 		vert.colliderRadius = colliderRadius;
 	}
+
 	void OnDestroy() {
 		if(begin) {
 			SplineNode node = begin;
