@@ -2228,8 +2228,8 @@ MonoBehaviour:
   AirMovementSpeedFactor: 0.8
   JumpStrength: 10
   FallSpeedFactor: 2
-  DodgeStrength: 18
-  DodgeDuration: 1
+  DodgeStrength: 21
+  DodgeDuration: 2.2
   PunchColliderDuration: 0.2
   PunchCooldownDuration: 0.45
   MaxLife: 5

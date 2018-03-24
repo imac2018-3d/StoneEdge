@@ -144,6 +144,7 @@ namespace Se {
 				var hero = go.GetComponent <Hero>();
 				hero.moveDirection = go.transform.forward * hero.DodgeStrength;
 				startTime = Time.time;
+				hero.animator.Play ("Dodge");
 			}
 			public override FsmState OnUpdate (GameObject go) {
 				var hero = go.GetComponent <Hero>();
