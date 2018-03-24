@@ -107,7 +107,7 @@ namespace Se {
 
 				if (ctrl.isGrounded) {
 					if (InputActions.Dodges) {
-						// AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
+						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
 						return new Dodge ();
 					}
 					if (InputActions.IsPunching) {
@@ -115,7 +115,7 @@ namespace Se {
 					}
 					hero.moveDirection = hero.GetMovementInput () * hero.GroundMovementSpeedFactor;
 					if (InputActions.Jumps) {
-						// AudioManager.GetInstance ().PlayAction (AudioManager.Action.Jump);
+						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Jump);
 						hero.moveDirection.y = hero.JumpStrength;
 					}
 				} else {
