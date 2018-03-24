@@ -1,7 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using Utils;
+using UnityEngine;
 using UnityEngine.Assertions;
+using Utils;
 
 namespace Se {
 
@@ -24,11 +25,13 @@ namespace Se {
 		Fsm fsm = new Fsm(new HeroStates.Movable());
 		internal int life;
 		internal Vector3 moveDirection = Vector3.zero;
+		internal Animator animator;
 
 		void Start () {
 			Assert.IsTrue(MaxLife > 0);
 			Assert.IsNotNull (Camera);
 			life = MaxLife;
+			animator = GetComponentInChildren<Animator> ();
 			fsm.OnStart (gameObject);
 		}
 		void Update() {
@@ -100,9 +103,11 @@ namespace Se {
 				var hero = go.GetComponent <Hero>();
 				var ctrl = go.GetComponent <CharacterController> ();
 
+				hero.animator.SetFloat ("Running", hero.GetMovementInput().magnitude);
+
 				if (ctrl.isGrounded) {
 					if (InputActions.Dodges) {
-						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
+						// AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
 						return new Dodge ();
 					}
 					if (InputActions.IsPunching) {
@@ -118,12 +123,11 @@ namespace Se {
 						AudioManager.GetInstance ().PlayAction (AudioManager.Action.BasicAttack);
 						hero.KeepAirKicking ();
 					}
-					var v = hero.GetMovementInput () * hero.AirMovementSpeedFactor;
-					var candidate = hero.moveDirection + v;
+					var candidate = hero.moveDirection + hero.GetMovementInput() * hero.AirMovementSpeedFactor;
 					candidate.y = 0f;
 					candidate = Vector3.ClampMagnitude (candidate, hero.GroundMovementSpeedFactor);
-					hero.moveDirection.x = candidate.x;
-					hero.moveDirection.z = candidate.z;
+					hero.moveDirection.x = Mathf.Lerp(candidate.x, 0f, 0.03f);
+					hero.moveDirection.z = Mathf.Lerp(candidate.z, 0f, 0.03f);
 				}
 				hero.moveDirection += Physics.gravity * hero.FallSpeedFactor * Time.deltaTime;
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
