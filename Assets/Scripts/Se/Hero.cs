@@ -24,11 +24,13 @@ namespace Se {
 		Fsm fsm = new Fsm(new HeroStates.Movable());
 		internal int life;
 		internal Vector3 moveDirection = Vector3.zero;
+		internal Animator animator;
 
 		void Start () {
 			Assert.IsTrue(MaxLife > 0);
 			Assert.IsNotNull (Camera);
 			life = MaxLife;
+			animator = GetComponentInChildren<Animator> ();
 			fsm.OnStart (gameObject);
 		}
 		void Update() {
@@ -99,6 +101,8 @@ namespace Se {
 			public override FsmState OnUpdate (GameObject go) {
 				var hero = go.GetComponent <Hero>();
 				var ctrl = go.GetComponent <CharacterController> ();
+
+				hero.animator.SetFloat ("Running", hero.GetMovementInput().magnitude);
 
 				if (ctrl.isGrounded) {
 					if (InputActions.Dodges) {

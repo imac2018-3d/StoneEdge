@@ -146,6 +146,7 @@ namespace Se {
 		}
 
         static void assertAllChunksHaveMatchingScene() {
+#if !DEADLINE_APPROACHING
             bool ok = true;
             foreach (ChunkID c in Enum.GetValues(typeof(ChunkID))) {
                 if (!Infos.ContainsKey (c)) {
@@ -153,7 +154,6 @@ namespace Se {
                     Debug.LogError ("ChunkID " + c + " does NOT have a matching scene name!");
                 }
             }
-#if !DEADLINE_APPROACHING
 			Exit.If (!ok, "All ChunkIDs must have a matching scene name!");
 #endif
         }
