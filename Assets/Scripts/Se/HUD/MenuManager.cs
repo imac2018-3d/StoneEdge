@@ -47,6 +47,9 @@ namespace Se {
 				if (menu == menuToShow) { menu.SetActive(true); }
 				else { menu.SetActive (false); }
 			}
+
+			Button firstButton = currentMenu.GetComponentInChildren<Button> ();
+			if(firstButton) firstButton.Select ();
 		}
 
 		// NOTE: Returns to the last menu
