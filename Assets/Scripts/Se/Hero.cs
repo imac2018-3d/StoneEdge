@@ -82,6 +82,7 @@ namespace Se {
 
 		public void doPunch() {
 			AudioManager.GetInstance ().PlayAction (AudioManager.Action.BasicAttack);
+			animator.Play ("PunchRight");
 			lastPunchStartTime = Time.time;
 			var go = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 			go.transform.SetParent (transform, false);
@@ -105,6 +106,7 @@ namespace Se {
 
 				hero.animator.SetFloat ("Running", hero.GetMovementInput().magnitude);
 
+				bool wasGrounded = ctrl.isGrounded;
 				if (ctrl.isGrounded) {
 					if (InputActions.Dodges) {
 						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Dodge);
@@ -116,9 +118,11 @@ namespace Se {
 					hero.moveDirection = hero.GetMovementInput () * hero.GroundMovementSpeedFactor;
 					if (InputActions.Jumps) {
 						AudioManager.GetInstance ().PlayAction (AudioManager.Action.Jump);
+						hero.animator.Play ("StartJumping");
 						hero.moveDirection.y = hero.JumpStrength;
 					}
 				} else {
+					hero.animator.SetFloat ("Falling", 1f);
 					if (InputActions.IsAirKicking) {
 						AudioManager.GetInstance ().PlayAction (AudioManager.Action.BasicAttack);
 						hero.KeepAirKicking ();
@@ -134,6 +138,11 @@ namespace Se {
 				var dir = hero.moveDirection;
 				dir.y = 0f;
 				go.transform.LookAt (go.transform.position + dir);
+
+				if(!wasGrounded && ctrl.isGrounded) {
+					hero.animator.Play ("Land");
+				}
+
 				return this;
 			}
 		}
