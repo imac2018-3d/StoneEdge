@@ -21,6 +21,12 @@ namespace Se {
 		public float AngleAroundY;
 		public float Distance;
 
+		public float MaxAngleAroundX = 80f;
+		public float MinAngleAroundX = -30f;
+		public float MinDistance = 4f;
+		public float MaxDistance = 10f;
+		public AnimationCurve DistanceFunction;
+
 		void Awake () {
 			Assert.IsNotNull (Target);
 		}
@@ -30,7 +36,7 @@ namespace Se {
 			AngleAroundY += input.x * Time.deltaTime * RotationAroundYSpeed;
 			AngleAroundX += input.y * Time.deltaTime * RotationAroundXSpeed;
 
-			AngleAroundX = Mathf.Clamp (AngleAroundX, 0f, 80f);
+			AngleAroundX = Mathf.Clamp (AngleAroundX, MinAngleAroundX, MaxAngleAroundX);
 			AngleAroundY = Mathf.Repeat (AngleAroundY, 360f);
 
 			Distance = computeDistanceFromAngleAroundX ();
@@ -43,7 +49,7 @@ namespace Se {
 		}
 
 		float computeDistanceFromAngleAroundX() {
-			return 20f * Mathf.Clamp(AngleAroundX, 10f, 50f) / 70f;
+			return MinDistance + MaxDistance * DistanceFunction.Evaluate (0.5f + AngleAroundX / 180f);
 		}
 	}
 
