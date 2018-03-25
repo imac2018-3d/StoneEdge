@@ -40,7 +40,10 @@ namespace Se {
 		public static AudioManager GetInstance() {
 			if (!instance)
 				instance = GameObject.FindGameObjectWithTag ("AudioManager");
-			return instance.GetComponent<AudioManager>();
+			if (instance)
+				return instance.GetComponent<AudioManager>();
+			else
+				return null;
 		}
 
 		public void Start() {

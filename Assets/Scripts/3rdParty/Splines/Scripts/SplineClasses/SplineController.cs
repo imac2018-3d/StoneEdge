@@ -1,3 +1,4 @@
+using Se;
 using UnityEngine;
 using System.Collections;
 
@@ -24,9 +25,9 @@ public class SplineController : MonoBehaviour {
 	public int PredictionCount = 2;
 	public float PredictionCoef = 1.0f;
 	public float PlayerBarycenter = 0.51f;
+	public float Height = 1;
 
 	private float currentSpeed;
-	private float lastInput = 0;
 
 	public Spline CurrentSpline;
 	public SplineNode CurrentNode;
@@ -88,33 +89,46 @@ public class SplineController : MonoBehaviour {
 				currentRotationSpeed = InitialRotationSpeed;
 			}
 		}
-		lastInput = input;
 	}
 
 	void updateVelocity(float input)
 	{
-		if (CurrentNode != null && input > 0)
+		if (input > 0)
 		{
-			Rigidbody body = GetComponent<Rigidbody>();
-			float projectionMagnitude = Vector3.Dot(body.velocity, targetForward);
-			if (projectionMagnitude*projectionMagnitude < 0.5 * body.velocity.sqrMagnitude) // straight rotation
+			if (CurrentNode != null)
 			{
-				rotationTime = 0.2f;
-				currentRotationSpeed = InitialRotationSpeed * 2;
-				Vector3 currentVelocity = body.velocity;
-				body.velocity = Vector3.zero;
-				body.AddForce(currentVelocity.magnitude * targetForward, ForceMode.Impulse);
-			}
-			else
-			{
-				Vector3 acc = targetForward * CurrentNode.acceleration * Speed;
-				body.AddForce(acc * Time.fixedDeltaTime, ForceMode.Impulse);
-				if (body.velocity.sqrMagnitude > CurrentNode.speed * CurrentNode.speed)
+				Rigidbody body = GetComponent<Rigidbody>();
+				float projectionMagnitude = Vector3.Dot(body.velocity, targetForward);
+				if (projectionMagnitude * projectionMagnitude < 0.5 * body.velocity.sqrMagnitude) // straight rotation
 				{
-					body.velocity = body.velocity.normalized*CurrentNode.speed;
+					rotationTime = 0.2f;
+					currentRotationSpeed = InitialRotationSpeed * 2;
+					Vector3 currentVelocity = body.velocity;
+					body.velocity = Vector3.zero;
+					body.AddForce(currentVelocity.magnitude * targetForward, ForceMode.Impulse);
+				}
+				else
+				{
+					Vector3 acc = targetForward * CurrentNode.acceleration * Speed;
+					body.AddForce(acc * Time.fixedDeltaTime, ForceMode.Impulse);
+					if (body.velocity.sqrMagnitude > CurrentNode.speed * CurrentNode.speed)
+					{
+						body.velocity = body.velocity.normalized * CurrentNode.speed;
+					}
 				}
 			}
+
 		}
+		else
+		{
+			Rigidbody body = GetComponent<Rigidbody>();
+			if (CurrentNode != null)
+			{
+				body.velocity = Vector3.Dot(body.velocity.normalized, targetForward) * body.velocity.magnitude * targetForward;
+			}
+			body.velocity *= 0.8f;
+		}
+
 	}
 
 	void updateRotation(float input)
@@ -129,7 +143,7 @@ public class SplineController : MonoBehaviour {
 			{
 				turnBack = true;
 				rotationTime = 0;
-				currentRotationSpeed = InitialRotationSpeed * 2;
+				currentRotationSpeed = InitialRotationSpeed * 1.5f;
 				targetForward = -1 * (CurrentNode.forward * Mathf.Sign(Vector3.Dot(transform.forward, CurrentNode.forward)));
 			}
 			rotationTime = Mathf.SmoothDamp(rotationTime, 1, ref currentRotationSpeed,
@@ -144,18 +158,15 @@ public class SplineController : MonoBehaviour {
 		if (CurrentNode)
 		{
 			updateTarget(input);
-			if (input > 0)
-			{
-				updateVelocity(input);
-			}
+			updateVelocity(input);
 			updateRotation(input);
 		}
 		else
 		{
 			Spline nextSpline;
 			SplineNode nextNode;
-			Vector3 position, currentPosition = transform.position - 
-				transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+			Vector3 position, currentPosition = transform.position -
+				transform.up * Height * PlayerBarycenter;
 			if (FindNextSpline(currentPosition, GetComponent<Rigidbody>().velocity*Time.fixedDeltaTime*PredictionCoef, 
 												out position, out nextSpline, out nextNode))
 			{
@@ -165,10 +176,10 @@ public class SplineController : MonoBehaviour {
 	}
 
 	public virtual void FixedUpdate() {
-		CharacterControl character = GetComponent<CharacterControl>();
+		CharacterController character = GetComponent<CharacterController>();
 
 		if (character)
-			Drive(character.MoveZ);
+			Drive(Se.InputActions.MovementDirection.y);
 		else
 			Drive();
 	}
@@ -229,8 +240,10 @@ public class SplineController : MonoBehaviour {
 		}
 		Debug.Log("detach" + Time.frameCount);
 		body.useGravity = true;
-		body.velocity = Vector3.zero;
-		body.AddForce(CurrentNode.speed * (targetForward+targetUp) * 0.5f, ForceMode.Impulse);
+		Hero heroScript = GetComponent<Hero>();
+		if (heroScript)
+			heroScript.enabled = true;
+		body.AddForce(CurrentNode.speed * (targetForward+targetUp)*0.5f, ForceMode.Impulse);
 		CurrentSpline.Oust();
 		CurrentSpline = null;
 		CurrentNode = null;
@@ -259,7 +272,7 @@ public class SplineController : MonoBehaviour {
 
 	bool FindNextSplineNode(SplineNode current, out SplineNode next, out Vector3 velocity, out Vector3 position)
 	{
-		Vector3 currentPosition = transform.position - transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+		Vector3 currentPosition = transform.position - transform.up * Height * PlayerBarycenter;
 		Vector3 newPosition = currentPosition;
 		next = current;
 		float currentSnapDist = SnapDistance;
@@ -276,7 +289,7 @@ public class SplineController : MonoBehaviour {
 			SnapDistance *= 1.3f;
 		}
 		SnapDistance = currentSnapDist;
-		position = newPosition + transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+		position = newPosition + transform.up * Height * PlayerBarycenter;
 		if (i < PredictionCount)
 		{
 			velocity = body.velocity * predictionCoef;
@@ -395,11 +408,15 @@ public class SplineController : MonoBehaviour {
 		Debug.Log("attach" + Time.frameCount);
 		Rigidbody body = GetComponent<Rigidbody>();
 		body.useGravity = false;
-		body.velocity = Vector3.zero;
+		Hero heroScript = GetComponent<Hero>();
+		if (heroScript)
+			heroScript.enabled = false;
 		rotationTime = 0; currentRotationSpeed = InitialRotationSpeed;
-		transform.position = position + transform.up * GetComponent<CapsuleCollider>().height * PlayerBarycenter;
+		transform.position = position + transform.up * Height * PlayerBarycenter;
 		CurrentSpline = landingSpline;
 		CurrentNode = landingNode;
+		body.velocity *= 0.8f;
+		updateVelocity(0.5f);
 	}
 
 	public void PartialLand(Vector3 position, Vector3 velocity, SplineNode landingNode)
@@ -407,7 +424,7 @@ public class SplineController : MonoBehaviour {
 		Debug.Log("reattach" + Time.frameCount);
 		Rigidbody body = GetComponent<Rigidbody>();
 		body.useGravity = false;
-		body.velocity = velocity;
+		body.velocity = body.velocity * 0.5f;
 		transform.position = position;
 		CurrentNode = landingNode;
 	}
