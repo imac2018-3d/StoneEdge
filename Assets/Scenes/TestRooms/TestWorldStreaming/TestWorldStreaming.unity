@@ -1504,19 +1504,24 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4007306052874428, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalRotation.x
-      value: -0.5567711
+      value: -0.55677104
       objectReference: {fileID: 0}
     - target: {fileID: 4007306052874428, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalRotation.y
-      value: -0.16339351
+      value: -0.1633935
       objectReference: {fileID: 0}
     - target: {fileID: 4007306052874428, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalRotation.z
-      value: -0.33321366
+      value: -0.33321363
       objectReference: {fileID: 0}
     - target: {fileID: 4007306052874428, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 0.74315363
+      value: 0.7431536
+      objectReference: {fileID: 0}
+    - target: {fileID: 114161411880665088, guid: 6cb2b6f621df64a87828a15611753037,
+        type: 2}
+      propertyPath: DodgeDuration
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
