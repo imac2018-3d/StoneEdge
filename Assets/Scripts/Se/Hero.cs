@@ -86,8 +86,9 @@ namespace Se {
 			lastPunchStartTime = Time.time;
 			var go = GameObject.CreatePrimitive (PrimitiveType.Sphere);
 			go.transform.SetParent (transform, false);
-			go.transform.Translate (Vector3.forward, Space.Self);
+			go.transform.Translate (Vector3.forward * 0.5f, Space.Self);
 			go.transform.Rotate(Vector3.right, 90f, Space.Self);
+			go.transform.localScale /= 2f;
 			go.AddComponent<ElectrickPunching> ();
 			Destroy (go, PunchColliderDuration);
 		}
@@ -106,6 +107,7 @@ namespace Se {
 
 				hero.animator.SetFloat ("Running", hero.GetMovementInput().magnitude);
 
+				var oldVelocity = ctrl.velocity;
 				bool wasGrounded = ctrl.isGrounded;
 				if (ctrl.isGrounded) {
 					if (InputActions.Dodges) {
@@ -135,13 +137,14 @@ namespace Se {
 				}
 				hero.moveDirection += Physics.gravity * hero.FallSpeedFactor * Time.deltaTime;
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
+
+				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < 1f) {
+					hero.animator.Play ("Land");
+				}
+
 				var dir = hero.moveDirection;
 				dir.y = 0f;
 				go.transform.LookAt (go.transform.position + dir);
-
-				if(!wasGrounded && ctrl.isGrounded) {
-					hero.animator.Play ("Land");
-				}
 
 				return this;
 			}
@@ -159,9 +162,18 @@ namespace Se {
 				var hero = go.GetComponent <Hero>();
 				var ctrl = go.GetComponent <CharacterController> ();
 				hero.moveDirection = Vector3.Lerp (hero.moveDirection, Vector3.zero, (Time.time - startTime) / hero.DodgeDuration);
+				if (!ctrl.isGrounded) {
+					hero.moveDirection += Physics.gravity * hero.FallSpeedFactor * Time.deltaTime;
+				}
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
-				if (hero.moveDirection.magnitude <= 0.5f)
+				var md = hero.moveDirection;
+				md.y = 0f;
+				if (md.magnitude <= 0.5f) {
+					if (!ctrl.isGrounded) {
+						hero.animator.Play ("Airborne");
+					}
 					return new Movable ();
+				}
 				return this;
 			}
 		}
