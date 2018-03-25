@@ -46,31 +46,31 @@ namespace Se {
 
 		// Use this for initialization
 		void Start () {
-			var resolutions = new List<String>();
+			/*var resolutions = new List<String>();
 			foreach (var resolution in Screen.resolutions) {
 				resolutions.Add (resolution.ToString());
 			}
 			ScreenResolution.AddOptions (resolutions);
 			ScreenResolution.value = Array.IndexOf(Screen.resolutions, Screen.currentResolution);
 
-			Windowed.isOn = !Screen.fullScreen;
+			Windowed.isOn = !Screen.fullScreen;*/
 
 			CurrentUserSettings.LoadSettings ();
 
-			AmbientAudioVolume.value = CurrentUserSettings.Data.AmbientVolume;
 			AmbientAudioVolume.minValue = 0.0f;
 			AmbientAudioVolume.maxValue = 1.0f;
-			newAmbientVolume = AmbientAudioVolume.value;
+			AmbientAudioVolume.value = CurrentUserSettings.Data.AmbientVolume;
+			newAmbientVolume = CurrentUserSettings.Data.AmbientVolume;
 
-			ActionAudioVolume.value = CurrentUserSettings.Data.ActionVolume;
 			ActionAudioVolume.minValue = 0.0f;
 			ActionAudioVolume.maxValue = 1.0f;
-			newActionVolume = ActionAudioVolume.value;
+			ActionAudioVolume.value = CurrentUserSettings.Data.ActionVolume;
+			newActionVolume = CurrentUserSettings.Data.ActionVolume;
 
-			MusicAudioVolume.value = CurrentUserSettings.Data.MusicVolume;
 			MusicAudioVolume.minValue = 0.0f;
 			MusicAudioVolume.maxValue = 1.0f;
-			newMusicVolume = MusicAudioVolume.value;
+			MusicAudioVolume.value = CurrentUserSettings.Data.MusicVolume;
+			newMusicVolume = CurrentUserSettings.Data.MusicVolume;
 
 
 			Jump.text = CurrentUserSettings.Data.KeyboardJump;
@@ -203,13 +203,13 @@ namespace Se {
 
 		}
 
-		public void SetResolution(int id) {
+		/*public void SetResolution(int id) {
 			Screen.SetResolution (Screen.resolutions[id].width, Screen.resolutions[id].height, Windowed.isOn);
 		}
 
 		public void SetWindowed(bool windowed) {
-			Screen.SetResolution (Screen.currentResolution.width, Screen.currentResolution.height, Windowed.isOn);
-		}
+			Screen.SetResolution (Screen.currentResolution.width, Screen.currentResolution.height, windowed);
+		}*/
 
 		public void SetAmbientVolume() {
 			newAmbientVolume = AmbientAudioVolume.value;

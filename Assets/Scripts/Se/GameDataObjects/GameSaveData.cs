@@ -35,7 +35,7 @@ namespace Se {
 
 		public static string SavePath {
 			get { 
-				return Path.Combine(Application.dataPath, JsonFileName);
+				return Path.Combine(Application.streamingAssetsPath, JsonFileName);
 			}
 		}
 

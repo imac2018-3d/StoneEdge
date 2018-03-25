@@ -48,8 +48,11 @@ namespace Se {
 				else { menu.SetActive (false); }
 			}
 
-			Button firstButton = currentMenu.GetComponentInChildren<Button> ();
-			if(firstButton) firstButton.Select ();
+			if (currentMenu) {
+				Button firstButton = currentMenu.GetComponentInChildren<Button> ();
+				if (firstButton)
+					firstButton.Select ();
+			}
 		}
 
 		// NOTE: Returns to the last menu

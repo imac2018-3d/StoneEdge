@@ -65,7 +65,7 @@ namespace Se {
 
 		public static string SavePath {
 			get { 
-				return Path.Combine(Application.dataPath, JsonFileName);
+				return Path.Combine(Application.streamingAssetsPath, JsonFileName);
 			}
 		}
 			
@@ -88,52 +88,52 @@ namespace Se {
 			SetAmbientVolume(Data.AmbientVolume);
 			SetMusicVolume(Data.MusicVolume);
 
-			if (Data.KeyboardJump == "" || Data.KeyboardJump == null)
+			if (Data.KeyboardJump == "" || Data.KeyboardJump == null || Data.KeyboardJump == "None")
 				SetKeyboardJump (InputActions.Bindings.Jump.Keyboard.ToString ());
 			else
 				SetKeyboardJump (Data.KeyboardJump);
 			
-			if (Data.KeyboardDodge == "" || Data.KeyboardDodge == null)
+			if (Data.KeyboardDodge == "" || Data.KeyboardDodge == null || Data.KeyboardDodge == "None")
 				SetKeyboardDodge (InputActions.Bindings.Dodge.Keyboard.ToString());
 			else
 				SetKeyboardDodge (Data.KeyboardDodge);
 			
-			if (Data.KeyboardBasicAttack == "" || Data.KeyboardBasicAttack == null)
+			if (Data.KeyboardBasicAttack == "" || Data.KeyboardBasicAttack == null || Data.KeyboardBasicAttack == "None")
 				SetKeyboardBasicAttack (InputActions.Bindings.BasicAttack.Keyboard.ToString());
 			else
 				SetKeyboardBasicAttack (Data.KeyboardBasicAttack);
 			
-			if (Data.KeyboardMagnetImpact == "" || Data.KeyboardMagnetImpact == null)
+			if (Data.KeyboardMagnetImpact == "" || Data.KeyboardMagnetImpact == null || Data.KeyboardMagnetImpact == "None")
 				SetKeyboardMagnetImpact (InputActions.Bindings.MagnetImpact.Keyboard.ToString());
 			else
 				SetKeyboardMagnetImpact (Data.KeyboardMagnetImpact);
 			
-			if (Data.KeyboardJumpQuake == "" || Data.KeyboardJumpQuake == null)
+			if (Data.KeyboardJumpQuake == "" || Data.KeyboardJumpQuake == null || Data.KeyboardJumpQuake == "None")
 				SetKeyboardJumpQuake (InputActions.Bindings.JumpQuake.Keyboard.ToString());
 			else
 				SetKeyboardJumpQuake (Data.KeyboardJumpQuake);
 
-			if (Data.XbButtonJump == "" || Data.XbButtonJump == null)
+			if (Data.XbButtonJump == "" || Data.XbButtonJump == null || Data.XbButtonJump == "None")
 				SetXbButtonJump (InputActions.Bindings.Jump.XboxController.ToString ());
 			else
 				SetXbButtonJump (Data.XbButtonJump);
 			
-			if (Data.XbButtonDodge == "" || Data.XbButtonDodge == null)
+			if (Data.XbButtonDodge == "" || Data.XbButtonDodge == null || Data.XbButtonDodge == "None")
 				SetXbButtonDodge (InputActions.Bindings.Dodge.XboxController.ToString());
 			else
 				SetXbButtonDodge (Data.XbButtonDodge);
 			
-			if (Data.XbButtonBasicAttack == "" || Data.XbButtonBasicAttack == null)
+			if (Data.XbButtonBasicAttack == "" || Data.XbButtonBasicAttack == null || Data.XbButtonBasicAttack == "None")
 				SetXbButtonBasicAttack (InputActions.Bindings.BasicAttack.XboxController.ToString());
 			else
 				SetXbButtonBasicAttack (Data.XbButtonBasicAttack);
 			
-			if (Data.XbButtonMagnetImpact == "" || Data.XbButtonMagnetImpact == null)
+			if (Data.XbButtonMagnetImpact == "" || Data.XbButtonMagnetImpact == null || Data.XbButtonMagnetImpact == "None")
 				SetXbButtonMagnetImpact (InputActions.Bindings.MagnetImpact.XboxController.ToString());
 			else
 				SetXbButtonMagnetImpact (Data.XbButtonMagnetImpact);
 			
-			if (Data.XbButtonJumpQuake == "" || Data.XbButtonJumpQuake == null)
+			if (Data.XbButtonJumpQuake == "" || Data.XbButtonJumpQuake == null || Data.XbButtonJumpQuake == "None")
 				SetXbButtonJumpQuake (InputActions.Bindings.JumpQuake.XboxController.ToString());
 			else
 				SetXbButtonJumpQuake (Data.XbButtonJumpQuake);
