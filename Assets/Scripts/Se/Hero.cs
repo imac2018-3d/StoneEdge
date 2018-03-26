@@ -138,7 +138,8 @@ namespace Se {
 				hero.moveDirection += Physics.gravity * hero.FallSpeedFactor * Time.deltaTime;
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
 
-				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < 1f) {
+				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < -6f) {
+					Debug.Log ("oldVelocity.y = " + oldVelocity.y);
 					hero.animator.Play ("Land");
 				}
 
