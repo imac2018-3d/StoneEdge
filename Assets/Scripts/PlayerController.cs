@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour {
 		RaycastHit hitInfo;
 		if (Physics.Linecast(rb.transform.position, rb.transform.position+rb.velocity*Time.deltaTime*5, out hitInfo))
 		{
-			if (hitInfo.transform.GetComponent<UnreachableArea>() != null)
+			if (hitInfo.transform.GetComponent<Se.UnreachableArea>() != null)
 			{
 				Warp();
 			}
@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour {
 		{
 			if (Physics.Raycast(rb.transform.position + movement + rb.velocity * 0.01f, -Vector3.up, out hitInfo))
 			{
-				if (hitInfo.transform.GetComponent<UnreachableArea>() == null &&
+				if (hitInfo.transform.GetComponent<Se.UnreachableArea>() == null &&
 					Vector3.Dot(Vector3.up, rb.transform.up) > 0.8f &&
 						(hitInfo.point - transform.position).sqrMagnitude < 1.0f)
 					lastValidPos = rb.transform.position;
