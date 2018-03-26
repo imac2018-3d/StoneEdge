@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.4964127, b: 0.5748172, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -9048,6 +9048,106 @@ Prefab:
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 5d808685cb271b44f974dc643b3256bf, type: 2}
   m_IsPrefabParent: 0
+--- !u!1001 &1319938187
+Prefab:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_RootOrder
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 224837243158618012, guid: f7a3d306aa432b143972930c1fef1f45,
+        type: 2}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 100100000, guid: f7a3d306aa432b143972930c1fef1f45, type: 2}
+  m_IsPrefabParent: 0
 --- !u!1 &1320953954
 GameObject:
   m_ObjectHideFlags: 0
@@ -9136,11 +9236,11 @@ Prefab:
     m_Modifications:
     - target: {fileID: 4381053861175838, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 575.35
+      value: 573.76
       objectReference: {fileID: 0}
     - target: {fileID: 4381053861175838, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 51.46
+      value: 56.9
       objectReference: {fileID: 0}
     - target: {fileID: 4381053861175838, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
       propertyPath: m_LocalPosition.z
@@ -9190,6 +9290,11 @@ Prefab:
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 114161411880665088, guid: 6cb2b6f621df64a87828a15611753037,
+        type: 2}
+      propertyPath: TransitionCanvas
+      value: 
+      objectReference: {fileID: 1451249455}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 6cb2b6f621df64a87828a15611753037, type: 2}
   m_IsPrefabParent: 0
@@ -9432,6 +9537,11 @@ MeshCollider:
   m_InflateMesh: 0
   m_SkinWidth: 0.01
   m_Mesh: {fileID: 4300038, guid: 0b82fe557d2996145912a090ca4d7eb1, type: 3}
+--- !u!223 &1451249455 stripped
+Canvas:
+  m_PrefabParentObject: {fileID: 223705871448999580, guid: f7a3d306aa432b143972930c1fef1f45,
+    type: 2}
+  m_PrefabInternal: {fileID: 1319938187}
 --- !u!1 &1455064904 stripped
 GameObject:
   m_PrefabParentObject: {fileID: 100118, guid: 0b82fe557d2996145912a090ca4d7eb1, type: 3}
@@ -12310,7 +12420,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 0b82fe557d2996145912a090ca4d7eb1, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 0b82fe557d2996145912a090ca4d7eb1, type: 3}
       propertyPath: m_Name

@@ -21,6 +21,11 @@ namespace Se {
 		public float PunchCooldownDuration = 1f;
 		public int MaxLife = 5;
 
+		// Warper
+		public float FallVelocityThreshold = -10.0f;
+		public Canvas TransitionCanvas = null;
+		internal Vector3 lastValidPos;
+
 		// private or hidden attributes
 		Fsm fsm = new Fsm(new HeroStates.Movable());
 		internal int life;
@@ -33,6 +38,7 @@ namespace Se {
 			life = MaxLife;
 			animator = GetComponentInChildren<Animator> ();
 			fsm.OnStart (gameObject);
+			lastValidPos = gameObject.transform.position;
 		}
 		void Update() {
 			fsm.OnUpdate (gameObject);
@@ -98,6 +104,46 @@ namespace Se {
 			this.gameObject.transform.position = newPosition;
 			Debug.Log (this.gameObject.transform.position);
 		}
+
+		public void Warp()
+		{
+			TransitionCanvas.GetComponent<Transition>().close(
+				() =>
+				{
+					moveDirection = Vector3.zero;
+					transform.position = lastValidPos;
+					transform.rotation = Quaternion.LookRotation(Vector3.forward, Vector3.up);
+					TransitionCanvas.GetComponent<Transition>().open();
+				}
+			);
+		}
+
+		public void CheckFall()
+		{
+			var ctrl = GetComponent<CharacterController>();
+			if (ctrl.velocity.y <= FallVelocityThreshold)
+			{
+				RaycastHit hitInfo;
+				if (!Physics.Raycast(gameObject.transform.position, ctrl.velocity, out hitInfo))
+				{
+					Warp();
+				}
+			}
+		}
+
+		public void CheckLocation()
+		{
+			var ctrl = GetComponent<CharacterController>();
+			RaycastHit hitInfo;
+			if (Physics.Linecast(gameObject.transform.position, gameObject.transform.position +
+				ctrl.velocity * Time.deltaTime * 5, out hitInfo))
+			{
+				if (hitInfo.transform.GetComponent<Se.UnreachableArea>() != null)
+				{
+					Warp();
+				}
+			}
+		}
 	}
 
 	namespace HeroStates {
@@ -146,6 +192,21 @@ namespace Se {
 				var dir = hero.moveDirection;
 				dir.y = 0f;
 				go.transform.LookAt (go.transform.position + dir);
+
+				hero.CheckFall();
+				hero.CheckLocation();
+				RaycastHit hitInfo;
+				if (hero.moveDirection.sqrMagnitude > 0)
+				{
+					if (Physics.Raycast(go.transform.position + hero.moveDirection + ctrl.velocity * 0.1f,
+						-Vector3.up, out hitInfo))
+					{
+						if (hitInfo.transform.GetComponent<Se.UnreachableArea>() == null &&
+							Vector3.Dot(Vector3.up, go.transform.up) > 0.8f && 
+							(hitInfo.point - go.transform.position).sqrMagnitude < 1.0f)
+							hero.lastValidPos = go.transform.position;
+					}
+				}
 
 				return this;
 			}
