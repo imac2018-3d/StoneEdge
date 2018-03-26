@@ -40,6 +40,7 @@ namespace Se {
 		void FixedUpdate() {
 			fsm.OnFixedUpdate (gameObject);
 			if (CurrentGameSaveData.DataChanged) {
+				Debug.Log ("Last checkpoint : " + CurrentGameSaveData.Data.LastCheckpoint);
 				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
 				CurrentGameSaveData.DataChanged = false;
 			}
@@ -138,7 +139,7 @@ namespace Se {
 				hero.moveDirection += Physics.gravity * hero.FallSpeedFactor * Time.deltaTime;
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
 
-				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < 1f) {
+				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < -6f) {
 					hero.animator.Play ("Land");
 				}
 
