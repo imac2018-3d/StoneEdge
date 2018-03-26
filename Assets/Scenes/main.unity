@@ -8641,6 +8641,11 @@ Prefab:
       propertyPath: m_TagString
       value: AudioManager
       objectReference: {fileID: 0}
+    - target: {fileID: 114811607480109708, guid: e7272301e80be8a4483700a80bd49b99,
+        type: 2}
+      propertyPath: MusicSamples.Array.data[0].sample
+      value: 
+      objectReference: {fileID: 8300000, guid: 7c636798615562a44801e86410618f01, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: e7272301e80be8a4483700a80bd49b99, type: 2}
   m_IsPrefabParent: 0
