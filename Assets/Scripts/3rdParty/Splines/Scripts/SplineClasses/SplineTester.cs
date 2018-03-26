@@ -23,18 +23,5 @@ public class SplineTester : SplineController {
 		GetComponent<Rigidbody>().velocity = transform.forward * initSpeed;
 	}
 	void OnDrawGizmos() {
-		if(accelDirection && predictionStep > 0) {		//This is noooo good if predictionStep < 1
-			Vector3 position = transform.position;
-			Vector3 acceleration = gravityForce * Vector3.up + accelScale * accelDirection.forward;
-			Vector3 tmpvel = transform.forward * initSpeed;
-			Vector3 curr;
-			int x;
-			for(x = 0; x < predictionLength; x += predictionStep) {
-				tmpvel += acceleration * Time.fixedDeltaTime * predictionStep;
-				curr = position + tmpvel * Time.fixedDeltaTime * predictionStep;
-				Gizmos.DrawLine(position, curr);
-				position = curr;
-			}
-		}
 	}
 }

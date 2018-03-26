@@ -1,3 +1,4 @@
+using Se;
 using UnityEngine;
 using System.Collections;
 
@@ -15,217 +16,321 @@ using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SplineController : MonoBehaviour {
-	const int MAX_OVER_ITER = 10;
-	public bool advancedMode;
 
-	public enum Mode { KEYBOARD, MOUSE, AUTO }
-	public Mode mode;
+	public float RotationDamping = 0.5f;
+	public float InitialRotationSpeed = 0.3f;
+	public float SnapDistance = 1;
+	public float RotationSpeedMax = 15;
+	public float Speed = 2.0f;
+	public int PredictionCount = 2;
+	public float PredictionCoef = 1.0f;
+	public float PlayerBarycenter = 0.51f;
+	public float Height = 1;
 
-	public bool looseFollow;
-	public float snapDistance = 0.1f;			//Mess with this if he "sticks" when he jumps
+	private float currentSpeed;
+
+	public Spline CurrentSpline;
+	public SplineNode CurrentNode;
+
+	private float rotationTime = 0;
+	private float currentRotationSpeed = 0.1f;
+
+	private Vector3 targetUp;
+	private Vector3 targetForward;
+
+	private bool turnBack = false;
 
 	public static int SplineTopLayer = 31;
 
-	public float airForce = 10;
-	public float maxAirSpeed = 8;
-	public float runForce = 10;
-	public float maxRunSpeed = 10;
-	public float stopForce = 60;
-	public float coastForce = 8;
-	public float stopThresh = 2; 	// Cuts velocity at this value, to cancel back & forth jitters in stopping.
-	public float gravityForce = -25f;
-	public float jumpVelocity = 11;
-
-	public float horizAcceleration;
-	public float horizSpeed;
-	public int predictionLength = 80;	//150?
-	public int predictionStep = 5;		//10?
-
-	public Spline gravSpline;
-	public Spline currentSpline;
-	public int startVert;
-	public float rotationDamping = 10;
-	public SplineNode gravNode;
-	public SplineNode groundNode;
-	protected Vector3 gravPosition;
-	protected bool gravAhead;
-
-	public Vector3 hoverOffset;
-
-	public Vector3 dragSplinePosition;
-
-	public bool goInReverse;
-	public bool reverseOrientation;
-	public bool go;
-	public bool ignoreNodes;
-	public bool ignoreNextNode;
-	public bool startOnVert;
-
-	public bool KeyControl = true;
-
-	public float pauseTime;
-	float pauseStart = Mathf.Infinity;
-	float resumeSpeed;
-
-	void OnGUI() {
-		GUI.Box(new Rect(Screen.width - 75, 25, 75, 20), GetComponent<Rigidbody>().velocity.ToString());
-	}
 	public virtual void Start() {
-		if(gravSpline) {			//If the user has specified a gravity spline, set it up
-			gravNode = gravSpline.begin;
-			gravPosition = gravNode.transform.position;
+		if(CurrentSpline) {
+			CurrentSpline.follower = this;
 		}
-		if(currentSpline) {
-			currentSpline.followers.Add(this);
-			if(startOnVert) {
-				groundNode = currentSpline[startVert];
-				if(groundNode)
-					transform.position = groundNode.transform.position;
+	}
+
+	void updateTarget(float input)
+	{
+		Rigidbody body = GetComponent<Rigidbody>();
+		SplineNode next;
+		Vector3 velocity, position;
+		if (FindNextSplineNode(out next, out velocity, out position))
+		{
+			rotationTime = 0.2f;
+			currentRotationSpeed = InitialRotationSpeed*2;
+			transform.position = position;
+			body.velocity = body.velocity.magnitude * Mathf.Sign(Vector3.Dot(body.velocity, next.forward)) * next.forward;
+		}
+		CurrentNode = next;
+		if (CurrentNode && !turnBack)
+		{
+			if (body.velocity.sqrMagnitude < 0.1)
+			{
+				currentSpeed = 0;
+				targetForward = (CurrentNode.forward * Mathf.Sign(Vector3.Dot(transform.forward, CurrentNode.forward)));
+			}
+			else
+			{
+				currentSpeed = Vector3.Dot(body.velocity, CurrentNode.forward);
+				targetForward = (CurrentNode.forward * Mathf.Sign(currentSpeed));
+			}
+			targetUp = CurrentNode.up;
+
+			if (input > 0)
+			{
+				if (currentSpeed == 0)
+				{
+					rotationTime = 0;
+					currentRotationSpeed = InitialRotationSpeed;
+				}
+			}
+			else if (input == 0)
+			{
+				rotationTime = 0;
+				currentRotationSpeed = InitialRotationSpeed;
 			}
 		}
 	}
-	protected virtual void DoNode(SplineNode node) {
-		switch(node.type) {
-		case SplineNode.Type.CONTINUE:
-			horizSpeed = node.speed;
-			break;
-		case SplineNode.Type.PAUSE:
-			horizSpeed = 0;
-			pauseTime = node.pauseTime;
-			pauseStart = Time.time;
-			resumeSpeed = node.speed;
-			break;
-		case SplineNode.Type.STOP:
-			horizSpeed = 0;
-			break;
-		case SplineNode.Type.REVERSE:
-			horizSpeed = 0;
-			goInReverse = !goInReverse;
-			pauseStart = Time.time;
-			pauseTime = node.pauseTime;
-			resumeSpeed = node.speed;
-			break;
+
+	void updateVelocity(float input)
+	{
+		if (input > 0)
+		{
+			if (CurrentNode != null)
+			{
+				Rigidbody body = GetComponent<Rigidbody>();
+				float projectionMagnitude = Vector3.Dot(body.velocity, targetForward);
+				if (projectionMagnitude * projectionMagnitude < 0.5 * body.velocity.sqrMagnitude) // straight rotation
+				{
+					rotationTime = 0.2f;
+					currentRotationSpeed = InitialRotationSpeed * 2;
+					Vector3 currentVelocity = body.velocity;
+					body.velocity = Vector3.zero;
+					body.AddForce(currentVelocity.magnitude * targetForward, ForceMode.Impulse);
+				}
+				else
+				{
+					Vector3 acc = targetForward * CurrentNode.acceleration * Speed;
+					body.AddForce(acc * Time.fixedDeltaTime, ForceMode.Impulse);
+					if (body.velocity.sqrMagnitude > CurrentNode.speed * CurrentNode.speed)
+					{
+						body.velocity = body.velocity.normalized * CurrentNode.speed;
+					}
+				}
+			}
+
+		}
+		else
+		{
+			Rigidbody body = GetComponent<Rigidbody>();
+			if (CurrentNode != null)
+			{
+				body.velocity = Vector3.Dot(body.velocity.normalized, targetForward) * body.velocity.magnitude * targetForward;
+			}
+			body.velocity *= 0.8f;
+		}
+
+	}
+
+	void updateRotation(float input)
+	{
+		if (CurrentNode)
+		{
+			if (turnBack)
+			{
+				turnBack = Vector3.Dot(transform.forward, targetForward) < 0.99;
+			}
+			else if (input < 0)
+			{
+				turnBack = true;
+				rotationTime = 0;
+				currentRotationSpeed = InitialRotationSpeed * 1.5f;
+				targetForward = -1 * (CurrentNode.forward * Mathf.Sign(Vector3.Dot(transform.forward, CurrentNode.forward)));
+			}
+			rotationTime = Mathf.SmoothDamp(rotationTime, 1, ref currentRotationSpeed,
+												RotationDamping, RotationSpeedMax, Time.fixedDeltaTime);
+			transform.rotation = Quaternion.Lerp(transform.rotation,
+																					Quaternion.LookRotation(targetForward, targetUp),
+																					rotationTime);
 		}
 	}
-	void Drive(Vector3 velocity, float input) {
-		if(groundNode)
-			horizSpeed = Vector3.Dot(velocity, groundNode.forward.normalized);
-		else if(gravNode)
-			horizSpeed = Vector3.Dot(velocity, gravNode.forward.normalized);
+
+	void Drive(float input = 0) {
+		if (CurrentNode)
+		{
+			updateTarget(input);
+			updateVelocity(input);
+			updateRotation(input);
+		}
 		else
-			horizSpeed = Vector3.Dot(velocity, Vector3.right.normalized);
-		if(input == 0)
-			Stop(coastForce, horizSpeed);
-		else if((horizSpeed > 1 && input < 0) || (horizSpeed < -1 && input > 0))
-			Stop(stopForce, horizSpeed);
-		else {
-			if(input > 0)
-				goInReverse = true;
-			else
-				goInReverse = false;
-			if(groundNode) {
-				if(Mathf.Abs(horizSpeed) < maxRunSpeed)
-					horizAcceleration = input * runForce;
-			} else {
-				if(Mathf.Abs(horizSpeed) < maxAirSpeed) {
-					horizAcceleration = input * airForce;
-				} else {
-					//Debug.Break();
-					horizAcceleration = 0;
+		{
+			Spline nextSpline;
+			SplineNode nextNode;
+			Vector3 position, currentPosition = transform.position -
+				transform.up * Height * PlayerBarycenter;
+			if (FindNextSpline(currentPosition, GetComponent<Rigidbody>().velocity*Time.fixedDeltaTime*PredictionCoef, 
+												out position, out nextSpline, out nextNode))
+			{
+					Land(position, nextSpline, nextNode);
+			}
+		}
+	}
+
+	public virtual void FixedUpdate() {
+		CharacterController character = GetComponent<CharacterController>();
+
+		if (character)
+			Drive(Se.InputActions.MovementDirection.y);
+		else
+			Drive();
+	}
+
+	void OnDrawGizmos() {
+		Gizmos.color = Color.cyan;
+		if(CurrentNode) {
+			Gizmos.DrawCube(CurrentNode.transform.position, Vector3.one * 0.1f);
+			Gizmos.DrawLine(CurrentNode.transform.position, CurrentNode.transform.position + CurrentNode.forward);
+			Gizmos.DrawLine(transform.position, transform.position + transform.forward);
+			Gizmos.color = Color.magenta;
+			Gizmos.DrawLine(CurrentNode.transform.position, CurrentNode.transform.position + CurrentNode.up);
+			Gizmos.DrawLine(transform.position, transform.position + transform.up);
+		}
+		if(CurrentSpline)
+		{
+			for (uint i=0; i<CurrentSpline.length;++i)
+			{
+				Gizmos.color = Color.blue;
+				Gizmos.DrawLine(CurrentSpline[i].transform.position, CurrentSpline[i].transform.position + CurrentSpline[i].forward);
+				Gizmos.color = Color.red;
+				Gizmos.DrawLine(CurrentSpline[i].transform.position, CurrentSpline[i].transform.position + CurrentSpline[i].up);
+			}
+		}
+	}
+
+	public void Detach() {
+		Rigidbody body = GetComponent<Rigidbody>();
+		if (CurrentSpline.next)
+		{
+			if (CurrentSpline.next.begin)
+			{
+				CurrentSpline = CurrentSpline.next;
+				CurrentNode = CurrentSpline.begin;
+				SplineNode next;
+				Vector3 position, velocity;
+				if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
+				{
+					PartialLand(position, velocity, next);
+					return;
 				}
 			}
 		}
-	}
-	public virtual void Update() {
-		if(go) {
-			/*
-			 * Horizontal control input handling
-			 */
-			switch(mode) {
-			case Mode.KEYBOARD:
-				float input = Input.GetAxis("Horizontal");
-				if(KeyControl)
-					Drive(GetComponent<Rigidbody>().velocity, input);
-				break;
+		if (CurrentSpline.previous)
+		{
+			if (CurrentSpline.previous.end)
+			{
+				CurrentSpline = CurrentSpline.previous;
+				CurrentNode = CurrentSpline.end;
+				SplineNode next;
+				Vector3 position, velocity;
+				if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
+				{
+					PartialLand(position, velocity, next);
+					return;
+				}
 			}
-			///*
-			// * For debugging: Press the b key to pause
-			// */
-			//if(Input.GetKeyDown(KeyCode.B)) {
-			//    //Debug.Break();
-			//}
 		}
+		Debug.Log("detach" + Time.frameCount);
+		body.useGravity = true;
+		Hero heroScript = GetComponent<Hero>();
+		if (heroScript)
+			heroScript.enabled = true;
+		body.AddForce(CurrentNode.speed * (targetForward+targetUp)*0.5f, ForceMode.Impulse);
+		CurrentSpline.Oust();
+		CurrentSpline = null;
+		CurrentNode = null;
 	}
-	public virtual void FixedUpdate() {
-		if(go) {
-			/*
-			 * Update velocity
-			 * THIS IS THE ONLY PLACE WE SHOULD DO THIS!!!
-			 */
-			if(Time.time > pauseStart + pauseTime) {
-				horizSpeed = resumeSpeed;
-				pauseStart = Mathf.Infinity;
-				ignoreNextNode = true;
-			} else ignoreNextNode = false;
-			if(groundNode) GetComponent<Rigidbody>().velocity = SplineMovement();
-			else GetComponent<Rigidbody>().velocity = AirMovement();
-			if(gravSpline)
-				GravMovement(transform.position, out gravPosition);
-			/*
-			 * Set the rotation sonic will Slerp to (hehe)
-			 * if we have a ground vertex, use it's forward vector
-			 * if we have a grav vertex, use it's forward vector
-			 * if we don't have either, look forward
-			 */
-			Quaternion targetRotation = Quaternion.identity;
-			if(groundNode)
-				targetRotation = Quaternion.LookRotation((goInReverse ^ reverseOrientation ? 1 : -1) * groundNode.transform.forward, groundNode.transform.up);
-			else if(gravNode)
-				targetRotation = Quaternion.LookRotation((goInReverse ^ reverseOrientation ? 1 : -1) * gravNode.transform.forward, gravNode.transform.up);
-			else
-				targetRotation = Quaternion.LookRotation((goInReverse ^ reverseOrientation ? 1 : -1) * Vector3.right, Vector3.up);
-			transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * rotationDamping);
+
+	bool FindNextSplineNode(out SplineNode next, out Vector3 velocity, out Vector3 position)
+	{
+		if (CurrentNode)
+		{
+			Rigidbody body = GetComponent<Rigidbody>();
+			if (FindNextSplineNode(CurrentNode, out next, out velocity, out position))
+			{
+				if (CurrentNode != next)
+				{
+					return true;
+				}
+				return false;
+			}
+			Detach();
 		}
+		next = null;
+		velocity = Vector3.zero;
+		position = Vector3.zero;
+		return false;
 	}
-	void OnDrawGizmos() {
-		//Ground = red
-		//Grav = green
-		//Other = blue
-		Gizmos.color = Color.cyan;
-		if(groundNode) {
-			Gizmos.DrawCube(groundNode.transform.position, Vector3.one * 0.1f);
-			Gizmos.DrawLine(groundNode.transform.position, groundNode.transform.position + groundNode.forward);
+
+	bool FindNextSplineNode(SplineNode current, out SplineNode next, out Vector3 velocity, out Vector3 position)
+	{
+		Vector3 currentPosition = transform.position - transform.up * Height * PlayerBarycenter;
+		Vector3 newPosition = currentPosition;
+		next = current;
+		float currentSnapDist = SnapDistance;
+		Rigidbody body = GetComponent<Rigidbody>();
+		float predictionCoef = PredictionCoef;
+		int i;
+		for (i = 0; i < PredictionCount; ++i)
+		{
+			if (FindSplineVertex(CurrentSpline, currentPosition, 
+												currentPosition + body.velocity * Time.fixedDeltaTime * predictionCoef,
+												current, out next, out newPosition, 3))
+				break;
+			predictionCoef *= 0.8f;
+			SnapDistance *= 1.3f;
 		}
-		Gizmos.color = Color.green;
-		if(currentSpline)
-			Gizmos.DrawCube(currentSpline.transform.position, Vector3.one * 0.1f);
+		SnapDistance = currentSnapDist;
+		position = newPosition + transform.up * Height * PlayerBarycenter;
+		if (i < PredictionCount)
+		{
+			velocity = body.velocity * predictionCoef;
+			return true;
+		}
+		velocity = body.velocity;
+		return false;
 	}
-	//	public void UpdateSpline(){
-	//		if(currentSpline != currentSplineSource.spline){
-	//			Svertex oldBegin = currentSpline.begin;
-	//			Svertex newBegin = currentSplineSource.spline.begin;
-	//			while(oldBegin.next != null && newBegin.next != null){		//roll forward through both splines until we find the old groundCV
-	//				if(oldBegin == groundCV)
-	//					break;
-	//				oldBegin = oldBegin.next;
-	//				newBegin = newBegin.next;
-	//			}
-	//			groundCV = newBegin;
-	//			currentSpline = currentSplineSource.spline;
-	//		}
-	//	}
-	public void Detach() {
-		//Debug.Log("detach" + Time.frameCount);
-		currentSpline = null;
-		groundNode = null;
-		transform.parent = null;
-	}
+
 	public bool FindSplineVertex(Spline s, Vector3 a, Vector3 b, out SplineNode vert, out Vector3 position) {
 		return FindSplineVertex(s, a, b, null, out vert, out position);
 	}
-	bool FindSplineVertex(Spline s, Vector3 a, Vector3 b, SplineNode guess, out SplineNode vert, out Vector3 position) {
+
+	bool checkSplineNode(SplineNode node, Vector3 a, Vector3 b, float sqrSnapDistance,
+											out Vector3 position)
+	{
+		if (node != null && node.next != null)
+		{
+			Vector3 PosToA = b - node.transform.position;
+			float dot = Vector3.Dot(PosToA, node.forward);
+			if (dot >= 0)
+			{
+				Vector3 projection = node.transform.position + dot * node.forward;
+				Debug.DrawLine(projection, b, Color.green);
+
+				if ((b - projection).sqrMagnitude < sqrSnapDistance
+					&& (node.transform.position - projection).sqrMagnitude < node.sqrMagnitude)
+				{
+					position = projection;
+					return true;
+				}
+			}
+		}
+		position = Vector3.zero;
+		return false;
+	}
+
+	bool FindSplineVertex(Spline s, Vector3 a, Vector3 b, SplineNode guess,
+												out SplineNode vert, out Vector3 position, int count=-1) {
 		SplineNode countup, countdown;
-		if(s != null) {
+		if (s != null) {
 			if(guess == null) {
 				if(!(s.begin && s.end)) {
 					Debug.LogError("Could not find vertex, begin and end not set");
@@ -239,296 +344,88 @@ public class SplineController : MonoBehaviour {
 				countdown = guess;
 				countup = guess;
 			}
-			Utility.Vector3Pair points;
-			while(countdown != null || countup != null) {
-				if(countup.next != null) {
-					//#if(DEBUG_DRAW||DEBUG_DRAW_LND)
-					Debug.DrawLine(countup.transform.position, countup.next.transform.position, Color.magenta);
-					//#endif
-					points = Utility.Dist3DSegToSeg(a, b, countup.transform.position, countup.next.transform.position);
-					if((points.a - points.b).magnitude < snapDistance) {
-						//Debug.Log(points.a + ", " + points.b);
-						Debug.DrawLine(points.b, transform.position, Color.magenta);
+			float squareSnap = SnapDistance * SnapDistance;
+			do
+			{
+				if (countup)
+				{
+					if (checkSplineNode(countup, a, b, squareSnap, out position))
+					{
 						vert = countup;
-						if(looseFollow)
-							position = transform.position;
-						else
-							position = points.b;
 						return true;
 					}
+					countup = countup.next;
 				}
-				countup = countup.next;
-				if(countdown.previous != null) {
-					//#if(DEBUG_DRAW||DEBUG_DRAW_LND)
-					Debug.DrawLine(countdown.transform.position, countdown.previous.transform.position, Color.cyan);
-					//#endif
-					points = Utility.Dist3DSegToSeg(a, b, countdown.transform.position, countdown.previous.transform.position);
-					if((points.a - points.b).magnitude < snapDistance) {
-						Debug.DrawLine(points.b, transform.position, Color.green);
+				if (countdown)
+				{
+					if (checkSplineNode(countdown.previous, a, b, squareSnap, out position))
+					{
 						vert = countdown.previous;
-						if(looseFollow)
-							position = transform.position;
-						else
-							position = points.b;
 						return true;
 					}
+					countdown = countdown.previous;
 				}
-				countdown = countdown.previous;
-			}
-		} else
-			Debug.LogError("Error in land, spline is null");
-		Debug.LogWarning("Warning in land - Couldn't find a vert");
+				count--;
+			} while (countdown != countup && count!=0);
+		}
 		vert = null;
 		position = Vector3.zero;
 		return false;
 	}
-	bool FindNextSpline(Vector3 position, Vector3 velocity, Vector3 acceleration, out Vector3 landing, out bool landed, out int traveltime) {
-#if (DEBUG_LOG)
-		Debug.Log("findNextSpline");
-#endif
-		traveltime = 0;
-		if(predictionStep > 0) {
-			Vector3 tmpvel = velocity;
-			RaycastHit hit;
-			Vector3 curr;
-			bool found = false;
-			int x;
-			for(x = 0; x < predictionLength; x += predictionStep) {
-				tmpvel += acceleration * Time.fixedDeltaTime * predictionStep;
-				curr = position + tmpvel * Time.fixedDeltaTime * predictionStep;
-				traveltime += predictionStep;
-				Debug.DrawLine(position, curr);
-				if(Physics.Linecast(position, curr, out hit, 1 << SplineTopLayer)) {
-					found = true;
-					break;
-				}
-				if(found)
-					break;
-				position = curr;
-			}
-			if(x == 0) {		//This means that the first cast hit the collider
-				for(int i = 0; i < predictionStep; i++) {
-					tmpvel += acceleration * Time.fixedDeltaTime;
-					//Do we really want to do this?
-					snapDistance = tmpvel.magnitude * Time.fixedDeltaTime;
-					curr = position + tmpvel * Time.fixedDeltaTime;
-					traveltime++;
-					if(Physics.Linecast(position, curr, out hit, 1 << SplineTopLayer)) {
-						// Debug.Log(zPlane.print());
-						if(i == 0) {	//This means that we'll land there this frame.
-							//projectedPosition = last;
-							//						if(currentSplineSource)
-							//							currentSplineSource.followers.Remove(this);
-							//Search despearately for the spline
-							if(hit.transform.parent)
-								currentSpline = hit.transform.parent.GetComponent<Spline>();
-							else
-								currentSpline = hit.transform.GetComponent<Spline>();
-							if(!currentSpline)
-								currentSpline = hit.transform.GetComponentInChildren<Spline>();
-							if(currentSpline) {
-								currentSpline.followers.Add(this);
-								transform.parent = currentSpline.transform;
-								//projectedPosition.z = currentSpline.transform.position.z;
-								if(FindSplineVertex(currentSpline, position, curr, out groundNode, out landing)) {
-									landed = true;
-								} else {
-									landed = false;
-									Debug.LogWarning("Error in findNextSpline - Couldn't Land");
-								}
-								return true;
-							}
-						}
-					}
-				}
-			}
-		} else Debug.LogError("cannot find next spline, prediction step < 1!");
-		landing = Vector3.zero;
-		landed = false;
-		return false;
-	}
 
-	public bool FindNextSplineMouse(out Vector3 position, Vector3 point) {
+	bool FindNextSpline(Vector3 position, Vector3 velocity, 
+											out Vector3 landingPos, out Spline nextSpline, out SplineNode nextNode) {
 		RaycastHit hit;
-		if(Physics.Raycast(point, Vector3.down, out hit, snapDistance, 1 << SplineTopLayer)) {
-			if(hit.transform.parent.GetComponent<Spline>()) {
-				currentSpline = hit.transform.parent.GetComponent<Spline>();
-				if(FindSplineVertex(currentSpline, point, point + Vector3.down * snapDistance, out groundNode, out position)) {
-					return true;
+		Debug.DrawLine(position, position+velocity, Color.magenta);
+		
+		LayerMask mask = LayerMask.GetMask(LayerMask.LayerToName(SplineTopLayer));
+		if (Physics.Linecast(position, position+velocity, out hit, mask.value))
+		{
+			if ((hit.point - position).sqrMagnitude < SnapDistance * SnapDistance)
+			{
+				if (hit.transform.parent)
+				{
+					nextSpline = hit.transform.parent.GetComponent<Spline>();
+					SplineCollider collider = hit.transform.GetComponent<SplineCollider>();
+					nextNode = null;
+					if (collider)
+						nextNode = collider.node;
+
+					if (FindSplineVertex(nextSpline, position, position + velocity, nextNode, out nextNode, out landingPos))
+						return true;
+
+					Debug.LogWarning("Error in findNextSpline - Couldn't Land");
 				}
 			}
 		}
-		position = Vector3.zero;
+		nextNode = null;
+		nextSpline = null;
+		landingPos = Vector3.zero;
 		return false;
 	}
 
-	protected void Stop(float acceleration, float speed) {
-		if(speed >= stopThresh)
-			horizAcceleration = -acceleration;
-		else if(speed <= -stopThresh)
-			horizAcceleration = acceleration;
-		else {
-			if(groundNode)
-				GetComponent<Rigidbody>().velocity = Vector3.zero;
-			else if(gravNode)
-				GetComponent<Rigidbody>().velocity = Vector3.Project(GetComponent<Rigidbody>().velocity, gravNode.transform.up);
-			else
-				GetComponent<Rigidbody>().velocity = Vector3.Project(GetComponent<Rigidbody>().velocity, Vector3.up);
-			horizAcceleration = 0;
-		}
+	public void Land(Vector3 position, Spline landingSpline, SplineNode landingNode) {
+		Debug.Log("attach" + Time.frameCount);
+		Rigidbody body = GetComponent<Rigidbody>();
+		body.useGravity = false;
+		Hero heroScript = GetComponent<Hero>();
+		if (heroScript)
+			heroScript.enabled = false;
+		rotationTime = 0; currentRotationSpeed = InitialRotationSpeed;
+		transform.position = position + transform.up * Height * PlayerBarycenter;
+		CurrentSpline = landingSpline;
+		CurrentNode = landingNode;
+		body.velocity *= 0.8f;
+		updateVelocity(0.5f);
 	}
-	//-------------------//
-	//	SPLINE PHYSICS!!!//
-	//-------------------//
-	bool NextNode() {
-		if(groundNode.next) {
-			groundNode = groundNode.next;
-			return true;
-		} else if(currentSpline.next) {
-			if(currentSpline.next.begin) {
-				currentSpline = currentSpline.next;
-				groundNode = currentSpline.begin;
-				return true;
-			} else Debug.LogWarning("Next spline missing begin");
-		}
-		return false;
+
+	public void PartialLand(Vector3 position, Vector3 velocity, SplineNode landingNode)
+	{
+		Debug.Log("reattach" + Time.frameCount);
+		Rigidbody body = GetComponent<Rigidbody>();
+		body.useGravity = false;
+		body.velocity = body.velocity * 0.5f;
+		transform.position = position;
+		CurrentNode = landingNode;
 	}
-	bool PreviousNode() {
-		if(groundNode.previous) {
-			groundNode = groundNode.previous;
-			return true;
-		} else {
-			if(currentSpline.previous) {
-				if(currentSpline.previous.end) {
-					currentSpline = currentSpline.previous;
-					groundNode = currentSpline.end;
-					return true;
-				} else Debug.LogWarning("Previous spline missing end");
-			}
-		}
-		return false;
-	}
-	protected Vector3 SplineMovement() {
-		if(!groundNode)
-			return GetComponent<Rigidbody>().velocity;
-		float horizFrameVelocity = 0;
-		switch(mode) {
-		case Mode.KEYBOARD:
-			horizFrameVelocity = (Vector3.Dot(GetComponent<Rigidbody>().velocity, groundNode.forward.normalized)
-				+ horizAcceleration * Time.fixedDeltaTime)
-				* Time.fixedDeltaTime;
-			break;
-		case Mode.AUTO:
-			horizFrameVelocity = (horizSpeed + horizAcceleration * Time.fixedDeltaTime) * Time.fixedDeltaTime * (goInReverse ? -1 : 1);
-			if(!ignoreNodes && !ignoreNextNode) {
-				if(horizFrameVelocity > 0 && groundNode.next) {	//We're moving "forward" and there's a next vert
-					if(horizFrameVelocity > (GetComponent<Rigidbody>().position - groundNode.next.transform.position).magnitude)
-						if(groundNode.next)
-							if(groundNode.next.fromPrevious)	//this node wants to be activated going forward
-								DoNode(groundNode.next);
-				} else if(groundNode) {		//We're moving "backward" and there's a previous vert
-					if(-horizFrameVelocity > (GetComponent<Rigidbody>().position - groundNode.transform.position).magnitude)
-						if(groundNode)
-							if(groundNode.fromNext)	//this node wants to be activated going forward
-								DoNode(groundNode);
-				}
-				horizFrameVelocity = (horizSpeed + horizAcceleration * Time.fixedDeltaTime) * Time.fixedDeltaTime * (goInReverse ? -1 : 1);
-			}
-			break;
-		}
-		Vector3 position = GetComponent<Rigidbody>().position;
-		Vector3 newVelocity = GetComponent<Rigidbody>().velocity;
-		if(horizFrameVelocity != 0) {
-			float distance = Mathf.Abs(horizFrameVelocity);
-			int itercount = MAX_OVER_ITER;
-			int iter = MAX_OVER_ITER;
-			/*
-			 * This while loop "adjusts" for any incoming error on groundNode.  If the first condition is
-			 * met, the node reference is too far forward, and must be decremented.  If the second is met,
-			 * the opposite is true and the node must be incremented.
-			 * niiiiice 8)
-			 */
-			while(iter-- > 0) {
-				if(Vector3.Dot(groundNode.forward, transform.position - groundNode.transform.position) < 0) {
-					if(!PreviousNode()) {
-						Detach();
-						return GetComponent<Rigidbody>().velocity;
-					}
-					continue;
-				} else if(groundNode.next) {
-					if(Vector3.Dot(groundNode.forward, transform.position - groundNode.next.transform.position) > 0) {
-						if(!NextNode()) {
-							Detach();
-							return GetComponent<Rigidbody>().velocity;
-						}
-						continue;
-					}
-				}
-				break;
-			}
-			if(horizFrameVelocity < 0)		//If we're going backward, come from the other direction
-				groundNode = groundNode.next;
-			if(groundNode) {
-				Debug.DrawLine(transform.position, transform.position + groundNode.forward * horizFrameVelocity, Color.red);
-				//We will loop until we have gone one node past the next desired position
-				while(distance > 0) {
-					if(horizFrameVelocity > 0) {		//Reaching the next vert going forward
-						if(!NextNode()) {
-							Detach();
-							return GetComponent<Rigidbody>().velocity;
-						}
-					}
-					if(horizFrameVelocity < 0) {	//Reaching the previous vert going backward
-						if(!PreviousNode()) {
-							Detach();
-							return GetComponent<Rigidbody>().velocity;
-						}
-					}
-					//calculate the distance to the next node
-					distance -= (position - groundNode.transform.position).magnitude;
-					//update position to the next node
-					position = groundNode.transform.position;
-					if(itercount-- < 0)
-						break;
-				}
-				//This statement is complicated
-				newVelocity = ((position + (position - transform.position).normalized * distance) - transform.position) * (1 / Time.fixedDeltaTime);
-				//if(groundNode.num == 2)
-				//    Debug.Log(horizFrameVelocity + ", " + distance + " | " + (transform.position + newVelocity * Time.fixedDeltaTime) + " - " + Time.frameCount);
-				if(horizFrameVelocity > 0)
-					groundNode = groundNode.previous;
-			} else return GetComponent<Rigidbody>().velocity;
-		} else return Vector3.zero;
-		return newVelocity;
-	}
-	protected Vector3 AirMovement() { return AirMovement(null); }
-	protected Vector3 AirMovement(Set levels) {
-		Vector3 absoluteAcceleration;
-		if(gravNode)
-			absoluteAcceleration = gravityForce * gravNode.transform.up + horizAcceleration * gravNode.transform.forward;
-		else
-			absoluteAcceleration = gravityForce * Vector3.up + horizAcceleration * Vector3.right;
-		//Debug.Log(horizAcceleration + ", " + absoluteAcceleration);
-		Vector3 newVelocity = GetComponent<Rigidbody>().velocity + absoluteAcceleration * Time.fixedDeltaTime;
-		Vector3 landing;
-		int traveltime;
-		bool landed;
-		if(Vector3.Dot(newVelocity, Vector3.up) < 0) {
-			if(FindNextSpline(GetComponent<Rigidbody>().position, GetComponent<Rigidbody>().velocity, absoluteAcceleration, out landing, out landed, out traveltime)) {
-				if(landed) {
-					Land();
-					transform.position = landing;
-					//rigidbody.velocity = Vector3.Project(rigidbody.velocity, groundNode.forward);
-					//if(horizAcceleration == 0)
-					//    rigidbody.velocity = Vector3.zero;
-					return SplineMovement();
-				}
-			}
-		}
-		return newVelocity;
-	}
-	protected void GravMovement(Vector3 position, out Vector3 gravPosition) {	//change the grav vert dependent on ground getPosition()
-		gravPosition = Vector3.zero;
-	}
-	public virtual void Land() { }
 }

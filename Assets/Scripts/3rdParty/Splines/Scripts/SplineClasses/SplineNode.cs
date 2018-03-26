@@ -8,45 +8,57 @@ using System.Collections;
  */
 [ExecuteInEditMode]
 public class SplineNode : MonoBehaviour {
-	public int num;						//THIS IS NOT AN INDEX
+	public int index;
 	public float colliderRadius = 0.125f;
-	public enum Type { CONTINUE, PAUSE, STOP, REVERSE }
-	public Type type;
-	public PrimitiveType colliderType = PrimitiveType.Capsule;
-	public bool colliderFreedom;
-	public bool rotationFreedom;
-	public bool hideHandles;
-	public float pauseTime = 1;
-	public float speed = 2;
 	public float addOffset = .5f;
 
-	public bool fromPrevious = true;
-	public bool fromNext = true;
+	public float acceleration = 0.5f;
+	public float speed = 10;
 
 	public SplineNode next, previous;
 	public Collider spanCollider;
 	public Spline spline;
 	public bool destroyed;
-	bool locked;
-	public bool Locked {
-		get { return locked; }
-		set {
-			locked = value;
-			if(value)
-				LockObjects();
-			else
-				UnlockObjects();
+
+	Vector3 _up = Vector3.up;
+	public Vector3 up
+	{
+		get { return transform.parent.rotation*_up; }
+		set { _up = value.normalized; }
+	}
+
+	Vector3 _forward = Vector3.right;
+	public Vector3 forward {
+		get {
+			return _forward;
+		}
+	}
+	float _sqrMagnitude = 0;
+	public float sqrMagnitude
+	{
+		get
+		{
+			return _sqrMagnitude;
 		}
 	}
 
-	public Vector3 forward {
-		get {
-			if(next)
+	public Vector3 toNext
+	{
+		get
+		{
+			if (next != null)
 				return next.transform.position - transform.position;
 			else
 				return Vector3.right;
 		}
 	}
+
+	public void updateForward()
+	{
+			_forward = toNext.normalized;
+			_sqrMagnitude = toNext.sqrMagnitude;
+	}
+
 	public Vector3 getForward(bool ahead) {
 		if(ahead)
 			return forward;
@@ -57,14 +69,6 @@ public class SplineNode : MonoBehaviour {
 			return Vector3.right;
 		}
 	}
-	public GameObject
-		node,
-		pause,
-		stop,
-		reverse,
-		nextArrow,
-		prevArrow,
-		handles;
 
 	public static SplineNode Create() {
 		GameObject obj = new GameObject();
@@ -72,153 +76,60 @@ public class SplineNode : MonoBehaviour {
 		obj.transform.Rotate(Vector3.up, 90);
 		return node;
 	}
+
 	void Start() {
 		if(!spline)
 			if(transform.parent)
 				spline = transform.parent.GetComponent<Spline>();
-				
-		foreach(Transform child in transform) {
-			child.gameObject.SetActive(false);
-			switch(child.name) {
-			case "NextArrow": if(!nextArrow) nextArrow = child.gameObject;	break;
-			case "PrevArrow": if(!prevArrow) prevArrow = child.gameObject; break;
-			case "node": if(!node) node = child.gameObject; break;
-			case "pause": if(!pause) pause = child.gameObject; break;
-			case "reverse": if(!reverse) reverse = child.gameObject; break;
-			case "stop": if(!stop) stop = child.gameObject; break;
-			case "RotationHandle":
-				handles = child.gameObject;
-				break;
-			}
-		}
+
 		RefreshModel();
 		ReOrient();
 	}
-	public void Update() {
-		if(!Application.isPlaying) {
-			RefreshModel();
-			ReOrient();
-		}
-	}
+
 	public void ReOrient() {
-		if(!rotationFreedom) {
-			if(next){ transform.LookAt(next.transform, transform.up);}
-			//else if(previous) {
-			//    transform.LookAt(previous.transform, transform.up);
-			//    //transform.Rotate(transform.up, 180);
-			//}
-		}
-		if(!colliderFreedom && next && spanCollider) {
-			spanCollider.transform.position = transform.position + forward * 0.5f;
-			spanCollider.transform.LookAt(next.transform, transform.up);
-			switch(colliderType) {
-			case PrimitiveType.Capsule:
-				CapsuleCollider cap = (CapsuleCollider)spanCollider;
-				if(cap) {
-					cap.radius = colliderRadius;
-					cap.height = forward.magnitude + colliderRadius * 2;							//+ radius * 2 for half a sphere on each side
-				}
-				break;
-			case PrimitiveType.Plane:
-				spanCollider.transform.localScale = new Vector3(colliderRadius * 2, 0.1f, forward.magnitude); // *0.1f;
-				break;
-			default: colliderType = PrimitiveType.Capsule; break;
+		if (next)
+		{
+			transform.LookAt(next.transform, transform.up);
+			CapsuleCollider cap = (CapsuleCollider)spanCollider;
+
+			if (cap)
+			{
+				cap.transform.position = transform.position + toNext * 0.5f;
+				cap.transform.LookAt(next.transform, transform.up);
+				cap.radius = colliderRadius;
+				cap.height = forward.magnitude + colliderRadius * 2;              //+ radius * 2 for half a sphere on each side
 			}
 		}
-		if(nextArrow) {
-			if(next && !hideHandles) {
-				nextArrow.SetActive(true);
-				nextArrow.transform.LookAt(next.transform, Vector3.forward);
-			} else nextArrow.SetActive(false);
-		}
-		if(prevArrow) {
-			if(previous && !hideHandles) {
-				prevArrow.SetActive(true);
-				prevArrow.transform.LookAt(previous.transform, Vector3.forward);
-			} else prevArrow.SetActive(false);
-		}
 	}
+
 	public void RefreshModel() {
-		if(handles) {
-			if(hideHandles) handles.SetActive(false);
-			else			handles.SetActive(true);
-		}
-		if(GetComponent<MeshFilter>() && GetComponent<Renderer>()) {
-			MeshFilter mesh = GetComponent<MeshFilter>();
-			switch(type) {
-			case Type.CONTINUE:
-				if(node) {
-					MeshFilter nodeMesh = node.GetComponent<MeshFilter>();
-					mesh.sharedMesh = nodeMesh.sharedMesh;
-					GetComponent<Renderer>().sharedMaterial = node.GetComponent<Renderer>().sharedMaterial;
-				}
-				break;
-			case Type.PAUSE:
-				if(pause) {
-					MeshFilter pauseMesh = pause.GetComponent<MeshFilter>();
-					mesh.sharedMesh = pauseMesh.sharedMesh;
-					GetComponent<Renderer>().sharedMaterial = pause.GetComponent<Renderer>().sharedMaterial;
-				}
-				break;
-			case Type.STOP:
-				if(stop) {
-					MeshFilter stopMesh = stop.GetComponent<MeshFilter>();
-					mesh.sharedMesh = stopMesh.sharedMesh;
-					GetComponent<Renderer>().sharedMaterial = stop.GetComponent<Renderer>().sharedMaterial;
-				}
-				break;
-			case Type.REVERSE:
-				if(reverse) {
-					MeshFilter reverseMesh = reverse.GetComponent<MeshFilter>();
-					mesh.sharedMesh = reverseMesh.sharedMesh;
-					GetComponent<Renderer>().sharedMaterial = reverse.GetComponent<Renderer>().sharedMaterial;
-				}
-				break;
-			}
-		}
 	}
+
 	public void AddCollider() {
 		if(spanCollider)
 			DestroyImmediate(spanCollider.gameObject);
 		if(next) {
-			switch(colliderType) {
-			case PrimitiveType.Capsule:
-				GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-				spanCollider = obj.GetComponent<Collider>();
-				CapsuleCollider cap = obj.GetComponent<CapsuleCollider>();
-				cap.isTrigger = true;
-				cap.direction = 2;
-				cap.height = forward.magnitude + colliderRadius * 2;
-				cap.radius = colliderRadius;
-				break;
-			case PrimitiveType.Plane:
-				GameObject plane = GameObject.CreatePrimitive(PrimitiveType.Cube);	//Plane has waay more triangles than we need
-				spanCollider = plane.GetComponent<Collider>();
-				plane.transform.localScale = new Vector3(colliderRadius * 2, 0.1f, forward.magnitude);// * 0.1f;
-				break;
-			case PrimitiveType.Sphere:
-				Debug.LogWarning("you can't use spheres! Spheres are right out.");
-				break;
-			case PrimitiveType.Cylinder:
-				Debug.LogWarning("Oh, just use a capsule");
-				break;
-			case PrimitiveType.Cube:
-				Debug.LogWarning("Oh, just use a capsule");
-				break;
-			}
-			spanCollider.gameObject.AddComponent<SplineColliderDraw>();
-//			DestroyImmediate(spanCollider.GetComponent<MeshFilter>());
-//			DestroyImmediate(spanCollider.renderer);
+			GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+			spanCollider = obj.GetComponent<Collider>();
+			CapsuleCollider cap = obj.GetComponent<CapsuleCollider>();
+			cap.isTrigger = true;
+			cap.direction = 2;
+			cap.height = toNext.magnitude + colliderRadius * 2;
+			cap.radius = colliderRadius;
+		
+			spanCollider.gameObject.AddComponent<SplineCollider>();
+			spanCollider.GetComponent<SplineCollider>().node = this;
 			spanCollider.GetComponent<Renderer>().enabled = false;
 			spanCollider.transform.parent = transform.parent;
 			
 			if(transform.parent)
-				if(transform.parent.GetComponent<Spline>())
-					if(transform.parent.GetComponent<Spline>().playerWalkable)
-						spanCollider.gameObject.layer = SplineController.SplineTopLayer;
+			if(transform.parent.GetComponent<Spline>())
+				if(transform.parent.GetComponent<Spline>().playerWalkable)
+					spanCollider.gameObject.layer = SplineController.SplineTopLayer;
 			spanCollider.isTrigger = true;
 		}
 	}
+
 	public GameObject AddNext() {
 		//New Node
 		GameObject dup = (GameObject)GameObject.Instantiate(gameObject);
@@ -232,15 +143,13 @@ public class SplineNode : MonoBehaviour {
 		dup.name = "Node";
 		SplineNode dupNode = dup.GetComponent<SplineNode>();
 		dupNode.spanCollider = null;
-		if(dupNode) {
-			if(next) {
-				next.previous = dupNode;
-				dupNode.next = next;
-				dupNode.AddCollider();
-			}
-			next = dupNode;													//The dup is now my previous node
-			dupNode.previous = this;										//I'm the dup's next node
-		}
+		if(next) {
+			next.previous = dupNode;
+			dupNode.next = next;
+			dupNode.AddCollider();
+		}	
+		next = dupNode;													//The dup is now my previous node
+		dupNode.previous = this;										//I'm the dup's next node
 		AddCollider();
 		if(spline)
 			spline.AddVert(dupNode);
@@ -271,30 +180,7 @@ public class SplineNode : MonoBehaviour {
 			spline.AddVert(dupNode);
 		return dup;
 	}
-	void LockObjects() {
-		if(handles) {
-			handles.hideFlags = HideFlags.HideInHierarchy;
-			foreach(Transform hchild in handles.transform)
-				hchild.gameObject.hideFlags = HideFlags.HideInHierarchy;
-		}
-		if(nextArrow)
-			nextArrow.hideFlags = HideFlags.HideInHierarchy;
-		if(prevArrow)
-			prevArrow.hideFlags = HideFlags.HideInHierarchy;
-	}
-	void UnlockObjects() {
-		if(handles) {
-			handles.hideFlags = 0;
-			foreach(Transform hchild in handles.transform)
-				hchild.gameObject.hideFlags = 0;
-		}
-		if(spanCollider)
-			spanCollider.gameObject.hideFlags = 0;
-		if(nextArrow)
-			nextArrow.hideFlags = 0;
-		if(prevArrow)
-			prevArrow.hideFlags = 0;
-	}
+
 	public void Disconnect() {
 		if(next) {
 			if(spanCollider) {

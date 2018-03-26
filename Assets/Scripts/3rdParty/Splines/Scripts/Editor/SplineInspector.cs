@@ -18,29 +18,14 @@ public class SplineInspector : Editor {
 		DrawDefaultInspector();
 		Spline spline = (Spline)target;
 		if(spline) {
-			if(spline.begin) {
-				EditorGUILayout.BeginVertical();
+			EditorGUILayout.BeginVertical();
+			EditorGUILayout.BeginHorizontal();
+			if (spline.begin) {
 				EditorGUILayout.BeginHorizontal();
-				if(GUILayout.Button("Set Speed")) {
+				if (GUILayout.Button("Set Speed")) {
 					SplineNode begin = spline.begin;
 					do {
 						begin.speed = spline.setSpeed;
-						begin = begin.next;
-					} while(begin && begin != spline.begin);
-				}
-				if(GUILayout.Button("Set Pause Time")) {
-					SplineNode begin = spline.begin;
-					do {
-						begin.pauseTime = spline.setPauseTime;
-						begin = begin.next;
-					} while(begin && begin != spline.begin);
-				}
-				if(GUILayout.Button("Toggle handles")) {
-					SplineNode begin = spline.begin;
-					spline.handlesOn = !spline.handlesOn;
-					do {
-						begin.hideHandles = spline.handlesOn;
-						begin.RefreshModel();
 						begin = begin.next;
 					} while(begin && begin != spline.begin);
 				}
@@ -53,41 +38,6 @@ public class SplineInspector : Editor {
 					} while(begin && begin != spline.begin);
 				}
 				EditorGUILayout.EndHorizontal();
-			}
-			spline.colliderRadius = EditorGUILayout.Slider("Global Collider Radius", spline.colliderRadius, Mathf.Epsilon, spline.maxColliderRadius);
-			SplineNode node = spline.begin;
-			do {
-				if(!node.colliderFreedom) {
-					node.colliderRadius = spline.colliderRadius;
-					node.ReOrient();
-				}
-				node = node.next;
-			} while(node && node != spline.begin);
-			EditorGUILayout.BeginHorizontal();
-			if(GUILayout.Button("Toggle colliders")) {
-				spline.collidersOn = !spline.collidersOn;
-				SplineColliderDraw[] colliders = spline.GetComponentsInChildren<SplineColliderDraw>();
-				foreach(SplineColliderDraw draw in colliders)
-					draw.draw = spline.collidersOn;
-			}
-			if(GUILayout.Button("Reset Colliders")) {
-				node = spline.begin;
-				do {
-					node.colliderType = spline.globalColliderType;
-					node.AddCollider();
-					node = node.next;
-				} while(node && node != spline.begin);
-				SplineColliderDraw[] colliders = spline.GetComponentsInChildren<SplineColliderDraw>();
-				foreach(SplineColliderDraw draw in colliders)
-					draw.draw = spline.collidersOn;
-			}
-			if(GUILayout.Button("Lock Ornaments")) {
-				node = spline.begin;
-				spline.locked = !spline.locked;
-				do {
-					node.Locked = spline.locked;
-					node = node.next;
-				} while(node && node != spline.begin) ;
 			}
 			EditorGUILayout.EndHorizontal();
 			EditorGUILayout.EndVertical();
