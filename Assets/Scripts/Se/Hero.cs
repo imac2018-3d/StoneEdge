@@ -40,6 +40,7 @@ namespace Se {
 		void FixedUpdate() {
 			fsm.OnFixedUpdate (gameObject);
 			if (CurrentGameSaveData.DataChanged) {
+				Debug.Log ("Last checkpoint : " + CurrentGameSaveData.Data.LastCheckpoint);
 				ChangePosition (Checkpoint.All[CurrentGameSaveData.Data.LastCheckpoint].transform.position);
 				CurrentGameSaveData.DataChanged = false;
 			}
@@ -139,7 +140,6 @@ namespace Se {
 				ctrl.Move(hero.moveDirection * Time.deltaTime);
 
 				if(!wasGrounded && ctrl.isGrounded && oldVelocity.y < -6f) {
-					Debug.Log ("oldVelocity.y = " + oldVelocity.y);
 					hero.animator.Play ("Land");
 				}
 

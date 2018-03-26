@@ -12,7 +12,7 @@
 // - Chunks are unloaded when reaching a sync Bridge and they're not
 //   referenced.
 
-#define DEADLINE_APPROACHING
+//#define DEADLINE_APPROACHING
 
 using System.Collections;
 using System.Collections.Generic;
@@ -30,18 +30,14 @@ namespace Se {
 	// Therefore, please only add new chunks, with a unique value, 
 	// and DO NOT remove any existing one. Only mark them as obsolete in the loadInfos() method.
     public enum ChunkID {
-		TempleForest = 5,
 		Forest = 6,
 		Nexus = 7,
 		Desert = 8,
-		DescenteDesert = 9,
-		TempleDesert = 10,
 		Canyon = 11,
-		Bridge = 12,
 		Plain = 13,
 		Village = 14,
 		TempleVillage = 15,
-		Mountain = 16,
+		Chute = 16,
 
 		Test0 = 100,
 		Test1 = 101,
@@ -65,18 +61,14 @@ namespace Se {
 				{ ChunkID.Test1, new Info("ChunkTest1", Obsolete.Yes) },
 				{ ChunkID.Test2, new Info("ChunkTest2", Obsolete.Yes) },
 				{ ChunkID.Test3, new Info("ChunkTest3", Obsolete.Yes) },
-				{ ChunkID.TempleForest, new Info("TempleForest") },
 				{ ChunkID.Forest, new Info("Forest") },
 				{ ChunkID.Nexus, new Info("Nexus") },
 				{ ChunkID.Desert, new Info("Desert") },
-				{ ChunkID.DescenteDesert, new Info("DescenteDesert") },
-				{ ChunkID.TempleDesert, new Info("TempleDesert") },
 				{ ChunkID.Canyon, new Info("Canyon") },
-				{ ChunkID.Bridge, new Info("Bridge") },
 				{ ChunkID.Plain, new Info("Plain") },
 				{ ChunkID.Village, new Info("Village") },
 				{ ChunkID.TempleVillage, new Info("TempleVillage") },
-				{ ChunkID.Mountain, new Info("Mountain") },
+				{ ChunkID.Chute, new Info("Chute") },
 				#endif
             };
         }
