@@ -199,12 +199,12 @@ namespace Se {
 				RaycastHit hitInfo;
 				if (hero.moveDirection.sqrMagnitude > 0)
 				{
-					if (Physics.Raycast(go.transform.position + hero.moveDirection + ctrl.velocity * 0.1f,
+					if (Physics.Raycast(go.transform.position + hero.moveDirection + ctrl.velocity * 0.1f + Vector3.up,
 						-Vector3.up, out hitInfo))
 					{
 						if (hitInfo.transform.GetComponent<Se.UnreachableArea>() == null &&
-							Vector3.Dot(Vector3.up, go.transform.up) > 0.8f && 
-							(hitInfo.point - go.transform.position).sqrMagnitude < 1.0f)
+							Vector3.Dot(Vector3.up, go.transform.up) > 0.5f && 
+							(hitInfo.point - go.transform.position).sqrMagnitude < 0.8f)
 							hero.lastValidPos = go.transform.position;
 					}
 				}
