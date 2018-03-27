@@ -55,8 +55,11 @@ public class SplineNode : MonoBehaviour {
 
 	public void updateForward()
 	{
-			_forward = toNext.normalized;
-			_sqrMagnitude = toNext.sqrMagnitude;
+		CapsuleCollider collider = GetComponent<CapsuleCollider>();
+		if (collider)
+			collider.height = toNext.magnitude;
+		_forward = toNext.normalized;
+		_sqrMagnitude = toNext.sqrMagnitude;
 	}
 
 	public Vector3 getForward(bool ahead) {
@@ -96,8 +99,8 @@ public class SplineNode : MonoBehaviour {
 			{
 				cap.transform.position = transform.position + toNext * 0.5f;
 				cap.transform.LookAt(next.transform, transform.up);
-				cap.radius = colliderRadius;
-				cap.height = forward.magnitude + colliderRadius * 2;              //+ radius * 2 for half a sphere on each side
+				cap.radius = colliderRadius * toNext.magnitude * 0.5f;
+				cap.height = toNext.magnitude;
 			}
 		}
 	}
@@ -114,8 +117,8 @@ public class SplineNode : MonoBehaviour {
 			CapsuleCollider cap = obj.GetComponent<CapsuleCollider>();
 			cap.isTrigger = true;
 			cap.direction = 2;
-			cap.height = toNext.magnitude + colliderRadius * 2;
-			cap.radius = colliderRadius;
+			cap.height = toNext.magnitude;
+			cap.radius = colliderRadius * toNext.magnitude * 0.5f;
 		
 			spanCollider.gameObject.AddComponent<SplineCollider>();
 			spanCollider.GetComponent<SplineCollider>().node = this;
