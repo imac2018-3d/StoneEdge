@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿#define DEADLINE_APPROACHING
+
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -38,8 +40,9 @@ namespace Se {
 			Debug.Log ("Found "+h.Count+" GameObjects to freeze");
 			return h;
 		}
-
+			
 		public static void FreezeTheWorld() {
+			#if !DEADLINE_APPROACHING
 			++IsWorldFrozen;
 			Debug.Log ("IsWorldFrozen is now " + IsWorldFrozen);
 			if (IsWorldFrozen > 1)
@@ -49,8 +52,10 @@ namespace Se {
 			foreach(var go in lastFrozenObjects) {
 	        	go.Freeze();
 	        }
+			#endif
 		}
 		public static void DefreezeTheWorld() {
+			#if !DEADLINE_APPROACHING
 			--IsWorldFrozen;
 			if (IsWorldFrozen < 0)
 				IsWorldFrozen = 0;
@@ -61,6 +66,7 @@ namespace Se {
 			foreach(var go in lastFrozenObjects) {
 	        	go.Defreeze();
 	        }
+			#endif
 		}
 
 		public static void Pause() {
