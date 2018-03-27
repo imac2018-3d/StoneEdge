@@ -84,9 +84,14 @@ public class SplineCreator : MonoBehaviour {
 				currentSpline.colliderRadius = ColliderRadius;
 			}
 		}
-		splineSystem.transform.rotation = transform.rotation;
+		splineSystem.transform.localScale = transform.localScale;
+		splineSystem.transform.localScale = new Vector3(1.0f / splineSystem.transform.localScale.x,
+																											1.0f / splineSystem.transform.localScale.y,
+																											1.0f / splineSystem.transform.localScale.z);
 		splineSystem.transform.position = transform.position;
-		splineSystem.transform.position.Scale(transform.localScale);
+		splineSystem.transform.position.Scale(splineSystem.transform.localScale);
+		splineSystem.transform.rotation = transform.rotation;
+
 		foreach (Spline s in GetComponentsInChildren<Spline>())
 		{
 			for (i = 0; i < s.length; ++i)
