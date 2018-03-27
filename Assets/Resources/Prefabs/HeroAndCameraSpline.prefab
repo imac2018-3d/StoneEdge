@@ -576,7 +576,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4232132033740530}
   m_Layer: 0
-  m_Name: HeroAndCameraAndSpline
+  m_Name: HeroAndCameraSpline
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2123,7 +2123,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1752777558797162}
-  m_LocalRotation: {x: -0.55677104, y: -0.1633935, z: -0.33321363, w: 0.7431536}
+  m_LocalRotation: {x: -0.5567711, y: -0.16339351, z: -0.33321366, w: 0.74315363}
   m_LocalPosition: {x: -0.45075986, y: 0.095405266, z: -0.13109064}
   m_LocalScale: {x: 1.0000006, y: 1, z: 1}
   m_Children:
