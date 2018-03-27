@@ -678,7 +678,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: cd9f50fb431508f47b8d4a0bddef3289, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1334.831
+      value: 1331
       objectReference: {fileID: 0}
     - target: {fileID: 400144, guid: cd9f50fb431508f47b8d4a0bddef3289, type: 3}
       propertyPath: m_LocalPosition.z
@@ -3495,6 +3495,11 @@ RectTransform:
   m_AnchoredPosition: {x: 754, y: -149.99997}
   m_SizeDelta: {x: 450, y: 300}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!20 &456537038 stripped
+Camera:
+  m_PrefabParentObject: {fileID: 20709905518674272, guid: 0b5d96b22260a954ea14650d14f1c26d,
+    type: 2}
+  m_PrefabInternal: {fileID: 1007620828}
 --- !u!1 &463775647
 GameObject:
   m_ObjectHideFlags: 0
@@ -5556,7 +5561,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 1
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 456537038}
   m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
