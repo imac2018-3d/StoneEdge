@@ -97,6 +97,7 @@ namespace Se {
 			go.transform.Rotate(Vector3.right, 90f, Space.Self);
 			go.transform.localScale /= 2f;
 			go.AddComponent<ElectrickPunching> ();
+			Destroy (go.GetComponent<Renderer>());
 			Destroy (go, PunchColliderDuration);
 		}
 
