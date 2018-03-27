@@ -207,6 +207,7 @@ public class SplineController : MonoBehaviour {
 	}
 
 	public void Detach() {
+		CharacterController ctrl = GetComponent<CharacterController>();
 		Rigidbody body = GetComponent<Rigidbody>();
 		if (CurrentSpline.next)
 		{
@@ -243,7 +244,7 @@ public class SplineController : MonoBehaviour {
 		Hero heroScript = GetComponent<Hero>();
 		if (heroScript)
 			heroScript.enabled = true;
-		body.AddForce(CurrentNode.speed * (targetForward+targetUp)*0.5f, ForceMode.Impulse);
+		body.AddForce(ctrl.velocity.magnitude * (targetForward-targetUp) * 5.0f, ForceMode.Impulse);
 		CurrentSpline.Oust();
 		CurrentSpline = null;
 		CurrentNode = null;

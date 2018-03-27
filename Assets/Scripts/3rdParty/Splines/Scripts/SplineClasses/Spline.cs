@@ -64,6 +64,9 @@ public class Spline : MonoBehaviour {
 
 	void Start() {
 		FindEnds();
+		SplineNode[] nodes = GetComponentsInChildren<SplineNode>();
+		foreach (SplineNode node in nodes)
+			node.updateForward();
 	}
 	public bool FindEnds() {
 		SplineNode[] nodes = GetComponentsInChildren<SplineNode>();
