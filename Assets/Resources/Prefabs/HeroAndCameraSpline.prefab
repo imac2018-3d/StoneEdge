@@ -2123,7 +2123,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1752777558797162}
-  m_LocalRotation: {x: -0.5567711, y: -0.16339351, z: -0.33321366, w: 0.74315363}
+  m_LocalRotation: {x: -0.55677104, y: -0.1633935, z: -0.33321363, w: 0.7431536}
   m_LocalPosition: {x: -0.45075986, y: 0.095405266, z: -0.13109064}
   m_LocalScale: {x: 1.0000006, y: 1, z: 1}
   m_Children:
@@ -2196,7 +2196,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!81 &81928597843253442
 AudioListener:
